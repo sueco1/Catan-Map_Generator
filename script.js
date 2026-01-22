@@ -28,7 +28,6 @@ document.addEventListener("DOMContentLoaded", () => {
     6: 5, 8: 5
   };
 
-  // Port Angles (mapped to Water Tile Indices)
   const portPositions = {
     0: 330,  2: 30,
     6: 270,  10: 270,
@@ -146,27 +145,20 @@ document.addEventListener("DOMContentLoaded", () => {
     updateStats(finalTiles);
 
     // 1. SETUP PORTS
-    // We define currentPorts. .pop() removes from the END.
-    // The render loop below iterates 0..17.
-    // It triggers pop() on indices: 0, 2, 5, 6, 9, 10, 13, 14, 16.
-    
     let currentPorts = [];
 
     if (useFixedPorts) {
-      // STANDARD CATAN ORDER: Generic -> Sheep -> Generic -> Ore -> Generic -> Wheat -> Brick -> Generic -> Wood
-      // Since pop() takes the LAST item, we must arrange the array in REVERSE of the trigger order.
-      // Trigger Order: 0(Gen), 2(Shp), 5(Gen), 6(Ore), 9(Gen), 10(Wht), 13(Brk), 14(Gen), 16(Wood)
-      
+      // REVERSE ORDER because .pop() takes from the end
       currentPorts = [
-        "wood",     // For index 16
-        "generic",  // For index 14
-        "brick",    // For index 13
-        "wheat",    // For index 10
-        "generic",  // For index 9
-        "ore",      // For index 6
-        "generic",  // For index 5
-        "sheep",    // For index 2
-        "generic"   // For index 0
+        "wood",     // Index 16
+        "generic",  // Index 14
+        "brick",    // Index 13
+        "wheat",    // Index 10
+        "generic",  // Index 9
+        "ore",      // Index 6
+        "generic",  // Index 5
+        "sheep",    // Index 2
+        "generic"   // Index 0
       ];
     } else {
       currentPorts = [...portTypesSource];
@@ -179,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
       div.classList.add("hex", "ocean", `water-${i}`);
 
       if (portPositions.hasOwnProperty(i)) {
-        const portType = currentPorts.pop(); // Logic works here for both Fixed and Random
+        const portType = currentPorts.pop();
         const rotation = portPositions[i];
         
         const portDiv = document.createElement("div");
@@ -189,10 +181,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const iconDiv = document.createElement("div");
         iconDiv.classList.add("port-icon", portType);
         
+        // --- ADDED TEXT LABEL BACK ---
         const textSpan = document.createElement("span");
-        
         textSpan.classList.add("port-text");
-        textSpan.style.transform = `rotate(${-rotation}deg)`;
+        // Counter-rotate text so it stays upright
+        textSpan.style.transform = `rotate(${-rotation}deg)`; 
         textSpan.textContent = portType === "generic" ? "3:1" : "2:1";
         
         iconDiv.appendChild(textSpan);
