@@ -56,53 +56,6 @@ h1 {
   cursor: pointer;
 }
 
-/* --- BOARD CONTAINER --- */
-#board-container {
-  display: flex;
-  justify-content: center; /* Tries to center the board */
-  width: 100%;
-  overflow: auto; /* IMPORTANT: Enables scrolling if it doesn't fit! */
-  padding-top: 10px;
-  padding-bottom: 50px; /* Extra space at bottom for scrolling */
-}
-
-#board {
-  position: relative;
-  /* The board is natively 800px wide based on your coordinate system */
-  width: 800px; 
-  height: 800px;
-  transform-origin: top center; 
-  transition: transform 0.3s ease; 
-  /* Ensures the board doesn't align weirdly inside the flex container */
-  flex-shrink: 0; 
-}
-
-/* --- RESPONSIVE SCALING --- */
-
-/* Tablets (iPad, etc.) */
-@media (max-width: 850px) {
-  #board {
-    transform: scale(0.7); 
-    margin-bottom: -200px; 
-  }
-}
-
-/* Phones (Mobile) */
-@media (max-width: 600px) {
-  #board {
-    /* Fixed scale: 0.42 * 800px = 336px. 
-       This fits inside almost all phones (which are usually ~375px wide) */
-    transform: scale(0.42); 
-    
-    /* Pulls the empty space at the bottom up */
-    margin-bottom: -450px; 
-    
-    /* Extra margin left ensures it doesn't get cut off on the left edge */
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
-
 /* --- HEXAGON STYLING --- */
 .hex {
   width: 100px;
@@ -253,3 +206,50 @@ h1 {
 .water-15{ top: 580px; left: 300px; }
 .water-16{ top: 580px; left: 400px; }
 .water-17{ top: 580px; left: 500px; }
+
+/* --- BOARD CONTAINER --- */
+#board-container {
+  display: flex;
+  justify-content: center; /* Tries to center the board */
+  width: 100%;
+  overflow: auto; /* IMPORTANT: Enables scrolling if it doesn't fit! */
+  padding-top: 10px;
+  padding-bottom: 50px; /* Extra space at bottom for scrolling */
+}
+
+#board {
+  position: relative;
+  /* The board is natively 800px wide based on your coordinate system */
+  width: 800px; 
+  height: 800px;
+  transform-origin: top center; 
+  transition: transform 0.3s ease; 
+  /* Ensures the board doesn't align weirdly inside the flex container */
+  flex-shrink: 0; 
+}
+
+/* --- RESPONSIVE SCALING --- */
+
+/* Tablets (iPad, etc.) */
+@media (max-width: 850px) {
+  #board {
+    transform: scale(0.7); 
+    margin-bottom: -200px; 
+  }
+}
+
+/* Phones (Mobile) */
+@media (max-width: 600px) {
+  #board {
+    /* Fixed scale: 0.42 * 800px = 336px. 
+       This fits inside almost all phones (which are usually ~375px wide) */
+    transform: scale(0.42); 
+    
+    /* Pulls the empty space at the bottom up */
+    margin-bottom: -450px; 
+    
+    /* Extra margin left ensures it doesn't get cut off on the left edge */
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
