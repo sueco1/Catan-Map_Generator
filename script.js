@@ -1,11 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
   const boardDiv = document.getElementById("board");
   const genBtn = document.getElementById("gen-btn");
-  const toggleBtn = document.getElementById("red-rule-toggle");
+  const redRuleToggle = document.getElementById("red-rule-toggle");
+  const fixedPortsToggle = document.getElementById("fixed-ports-toggle");
 
   // --- CONFIGURATION ---
 
-  // 1. Terrain Distribution (Standard Base Game)
   const terrains = [
     "desert",
     "ore", "ore", "ore",
@@ -15,13 +15,11 @@ document.addEventListener("DOMContentLoaded", () => {
     "wheat", "wheat", "wheat", "wheat"
   ];
 
-  // 2. Number Distribution (Skip 7)
   const numbers = [
     2, 3, 3, 4, 4, 5, 5, 6, 6,
     8, 8, 9, 9, 10, 10, 11, 11, 12
   ];
 
-  // 3. Pip Map (Dots count)
   const pipMap = {
     2: 1, 12: 1,
     3: 2, 11: 2,
@@ -31,39 +29,46 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // 4. Port Configuration
+  // Positions (Water Tile Index -> Rotation)
+  // The ORDER here follows the clockwise spiral from top-left
   const portPositions = {
-    0: 330,  2: 30,
-    6: 270,  10: 270,
-    5: 30,   9: 90,   13: 150,
-    14: 210, 16: 150
+    0: 330,  // Top Left
+    2: 30,   // Top Right
+    5: 30,   // Right Top
+    9: 90,   // Right Middle
+    13: 150, // Right Bottom
+    16: 150, // Bottom Right
+    14: 210, // Bottom Left
+    10: 270, // Left Bottom
+    6: 270   // Left Top
   };
 
-  const portTypesSource = [
+  // STANDARD PORT ORDER (Clockwise from Top Left)
+  // Based on standard board setup
+  const standardPorts = [
+    "generic", // 0
+    "sheep",   // 2
+    "generic", // 5
+    "generic", // 9
+    "brick",   // 13
+    "wood",    // 16
+    "generic", // 14
+    "wheat",   // 10
+    "ore"      // 6
+  ];
+
+  // Random Source
+  const randomPortsSource = [
     "wood", "brick", "sheep", "wheat", "ore",
     "generic", "generic", "generic", "generic"
   ];
 
-  // 5. Adjacency Map
   const adjacency = {
-    0: [1, 3, 4],
-    1: [0, 2, 4, 5],
-    2: [1, 5, 6],
-    3: [0, 4, 7, 8],
-    4: [0, 1, 3, 5, 8, 9],
-    5: [1, 2, 4, 6, 9, 10],
-    6: [2, 5, 10, 11],
-    7: [3, 8, 12],
-    8: [3, 4, 7, 9, 12, 13],
-    9: [4, 5, 8, 10, 13, 14],
-    10: [5, 6, 9, 11, 14, 15],
-    11: [6, 10, 15],
-    12: [7, 8, 13, 16],
-    13: [8, 9, 12, 14, 16, 17],
-    14: [9, 10, 13, 15, 17, 18],
-    15: [10, 11, 14, 18],
-    16: [12, 13, 17],
-    17: [13, 14, 16, 18],
-    18: [14, 15, 17]
+    0: [1, 3, 4], 1: [0, 2, 4, 5], 2: [1, 5, 6],
+    3: [0, 4, 7, 8], 4: [0, 1, 3, 5, 8, 9], 5: [1, 2, 4, 6, 9, 10], 6: [2, 5, 10, 11],
+    7: [3, 8, 12], 8: [3, 4, 7, 9, 12, 13], 9: [4, 5, 8, 10, 13, 14], 10: [5, 6, 9, 11, 14, 15], 11: [6, 10, 15],
+    12: [7, 8, 13, 16], 13: [8, 9, 12, 14, 16, 17], 14: [9, 10, 13, 15, 17, 18], 15: [10, 11, 14, 18],
+    16: [12, 13, 17], 17: [13, 14, 16, 18], 18: [14, 15, 17]
   };
 
   // --- HELPERS ---
@@ -89,12 +94,8 @@ document.addEventListener("DOMContentLoaded", () => {
     return false;
   }
 
-  // --- NEW STATS FUNCTION ---
   function updateStats(tiles) {
-    // 1. Reset counts
     const counts = { wood: 0, brick: 0, sheep: 0, wheat: 0, ore: 0 };
-    
-    // 2. Loop through tiles and sum pips
     tiles.forEach(tile => {
       if (tile.terrain !== "desert" && tile.number !== null) {
         const pips = pipMap[tile.number];
@@ -104,17 +105,12 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // 3. Update HTML
-    const maxPips = 18; // 18 is usually a high count (helps scaling)
-    
+    const maxPips = 18; 
     for (const [resource, count] of Object.entries(counts)) {
       const valEl = document.getElementById(`val-${resource}`);
       const barEl = document.getElementById(`bar-${resource}`);
-      
       if (valEl && barEl) {
-        // Update Number
         valEl.textContent = count;
-        // Update Bar Width (capped at 100%)
         const percentage = Math.min((count / maxPips) * 100, 100); 
         barEl.style.width = `${percentage}%`;
       }
@@ -124,16 +120,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- MAIN GENERATOR ---
 
   genBtn.addEventListener("click", () => {
-    const useRedRule = toggleBtn ? toggleBtn.checked : true;
+    const useRedRule = redRuleToggle ? redRuleToggle.checked : true;
+    const useFixedPorts = fixedPortsToggle ? fixedPortsToggle.checked : false;
+
+    // 1. GENERATE TILES (Logic unchanged)
     let validMapFound = false;
     let attemptCount = 0;
     let finalTiles = [];
 
-    // Retry Loop
     while (!validMapFound && attemptCount < 1000) {
       attemptCount++;
-      
-      // Setup Tiles
       let currentTerrains = [...terrains];
       shuffle(currentTerrains);
       
@@ -142,15 +138,12 @@ document.addEventListener("DOMContentLoaded", () => {
         tempTiles.push({ id: i, terrain: currentTerrains[i], number: null });
       }
 
-      // Setup Numbers
       let currentNumbers = [...numbers];
       shuffle(currentNumbers);
 
-      // Assign Numbers
       let mapIsValid = true;
       for (let tile of tempTiles) {
         if (tile.terrain === "desert") continue;
-
         const num = currentNumbers.pop();
         tile.number = num;
 
@@ -169,37 +162,69 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (!validMapFound) {
-      alert("Could not find a valid map layout in 1000 attempts. Try again!");
+      alert("Could not find a valid map layout. Try again!");
       return;
     }
 
     // --- RENDERING ---
     boardDiv.innerHTML = "";
-    
-    // ** UPDATE STATS HERE **
     updateStats(finalTiles);
 
-    // 1. Shuffle Ports
-    const currentPorts = [...portTypesSource];
-    shuffle(currentPorts);
+    // 2. SETUP PORTS
+    let finalPorts = [];
+    
+    if (useFixedPorts) {
+      // Use standard list. Reverse it because we use .pop() (LIFO)
+      // Standard order is 0->2->5..., but .pop() takes the last one first.
+      // So we reverse it so the first item (Index 0) is at the end of array.
+      finalPorts = [...standardPorts].reverse();
+    } else {
+      // Shuffle random ports
+      finalPorts = [...randomPortsSource];
+      shuffle(finalPorts);
+    }
 
-    // 2. Render Water & Ports
+    // 3. RENDER PORTS (Specific Iteration Order)
+    // We must iterate through the water tiles in the specific order defined in portPositions
+    // To ensure "Fixed Ports" appear in the correct clockwise slots.
+    
+    // The keys of portPositions are [0, 2, 5, 9, 13, 16, 14, 10, 6] (roughly)
+    // We need to loop 0..17 for rendering, but check against positions.
+    
+    // Actually, because portPositions is an Object, order isn't guaranteed in loop.
+    // But since we map Index -> Rotation, we just need to make sure we assign 
+    // the popped port to the correct index based on our "Clockwise" logic.
+    
+    // Let's create a specific order array for the water tiles that HAVE ports
+    const waterTilesWithPorts = [0, 2, 5, 9, 13, 16, 14, 10, 6];
+
+    // Create a map of Index -> PortType for easy rendering
+    const assignedPorts = {};
+    waterTilesWithPorts.forEach(waterIndex => {
+        assignedPorts[waterIndex] = finalPorts.pop(); // Take from stack
+    });
+
+    // RENDER WATER
     for (let i = 0; i < 18; i++) {
       const div = document.createElement("div");
       div.classList.add("hex", "ocean", `water-${i}`);
 
       if (portPositions.hasOwnProperty(i)) {
-        const portType = currentPorts.pop();
         const rotation = portPositions[i];
+        const portType = assignedPorts[i]; // Get the assigned type
+
         const portDiv = document.createElement("div");
         portDiv.classList.add("port");
         portDiv.style.transform = `rotate(${rotation}deg)`;
+        
         const iconDiv = document.createElement("div");
         iconDiv.classList.add("port-icon", portType);
+        
         const textSpan = document.createElement("span");
         textSpan.classList.add("port-text");
         textSpan.style.transform = `rotate(${-rotation}deg)`;
         textSpan.textContent = portType === "generic" ? "3:1" : "2:1";
+        
         iconDiv.appendChild(textSpan);
         portDiv.appendChild(iconDiv);
         div.appendChild(portDiv);
@@ -207,7 +232,7 @@ document.addEventListener("DOMContentLoaded", () => {
       boardDiv.appendChild(div);
     }
 
-    // 3. Render Land & Tokens
+    // 4. RENDER LAND
     finalTiles.forEach(tile => {
       const div = document.createElement("div");
       div.classList.add("hex", tile.terrain, `tile-${tile.id}`);
@@ -215,10 +240,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (tile.number !== null) {
         const token = document.createElement("div");
         token.classList.add("token");
-
-        if (tile.number === 6 || tile.number === 8) {
-          token.style.color = "#d50000";
-        }
+        if (tile.number === 6 || tile.number === 8) token.style.color = "#d50000";
 
         const numSpan = document.createElement("span");
         numSpan.classList.add("token-number");

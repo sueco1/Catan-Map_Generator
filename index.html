@@ -11,13 +11,26 @@
   <h1>Catan Map Generator</h1>
 
   <div class="controls">
-    <button id="gen-btn">Generate Map</button>
-    
-    <label class="toggle-container">
-      <input type="checkbox" id="red-rule-toggle" checked>
-      <span>Separate 6 & 8</span>
-    </label>
+  <button id="gen-btn">Generate Map</button>
+  
+  <div class="toggles-container">
+    <div class="toggle-wrapper">
+      <label class="switch">
+        <input type="checkbox" id="red-rule-toggle" checked>
+        <span class="slider round"></span>
+      </label>
+      <span class="toggle-label">No touching 6/8</span>
+    </div>
+
+    <div class="toggle-wrapper">
+      <label class="switch">
+        <input type="checkbox" id="fixed-ports-toggle">
+        <span class="slider round"></span>
+      </label>
+      <span class="toggle-label">Fixed Ports</span>
+    </div>
   </div>
+</div>
 
   <div class="game-layout">
 
