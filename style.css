@@ -211,18 +211,19 @@ h1 {
 #board-container {
   position: relative;
   width: 100%;
-  /* Default height for desktop */
+  /* Default Desktop Height */
   height: 850px; 
-  /* CUTS OFF the extra white space */
   overflow: hidden; 
   padding-top: 20px;
+  /* Centers the content in the container */
+  display: block; 
 }
 
 #board {
-  position: relative;
+  /* Default Desktop State */
+  position: relative; 
   width: 800px;
   height: 800px;
-  /* Default Desktop Behavior */
   transform-origin: top center;
   transition: transform 0.3s ease;
   margin: 0 auto; 
@@ -236,23 +237,30 @@ h1 {
     transform: scale(0.7); 
   }
   #board-container {
-    height: 600px; /* Adjusted height for tablets */
+    height: 600px; 
   }
 }
 
-/* Phones */
+/* Phones - THE FIX */
 @media (max-width: 600px) {
   #board-container {
-    /* 800px * 0.42 = ~336px. We set 350px to fit it perfectly. */
-    height: 350px; 
+    /* STRICT HEIGHT: Matches the scaled board size (800 * 0.42 = ~336) */
+    height: 360px; 
+    padding: 0;
+    margin: 0;
+    overflow: hidden; /* Cuts off everything else */
   }
 
   #board {
-    /* Center the board */
-    left: 50%;
+    /* ABSOLUTE: Removes the 'ghost' 800px height from the page flow */
+    position: absolute; 
+    top: 10px; /* Small gap from top */
+    
+    /* Center horizontally */
+    left: 50%; 
     margin-left: -400px; 
     
-    /* Scale from top */
+    /* Scale */
     transform-origin: top center;
     transform: scale(0.42); 
   }
