@@ -265,3 +265,87 @@ h1 {
     transform: scale(0.42); 
   }
 }
+
+/* --- GAME LAYOUT (Desktop) --- */
+.game-layout {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 40px; /* Space between board and graph */
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* --- STATS PANEL --- */
+#stats-panel {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  width: 280px;
+  margin-top: 40px; /* Aligns visually with the board top */
+}
+
+#stats-panel h3 {
+  margin-top: 0;
+  text-align: center;
+  color: #333;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.stat-label {
+  width: 50px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.stat-value {
+  width: 30px;
+  text-align: right;
+  font-weight: bold;
+}
+
+.bar-container {
+  flex-grow: 1;
+  background: #eee;
+  height: 12px;
+  border-radius: 6px;
+  margin: 0 10px;
+  overflow: hidden;
+}
+
+.bar {
+  height: 100%;
+  width: 0%; /* JS will change this */
+  transition: width 0.5s ease;
+  border-radius: 6px;
+}
+
+/* Bar Colors */
+.wood-bar { background-color: #228b22; }
+.brick-bar { background-color: #e34234; }
+.sheep-bar { background-color: #8bc34a; }
+.wheat-bar { background-color: #fdd835; }
+.ore-bar { background-color: #78909c; }
+
+
+/* --- MOBILE ADJUSTMENTS --- */
+@media (max-width: 850px) {
+  .game-layout {
+    flex-direction: column; /* Stack them */
+    align-items: center;
+    gap: 0;
+  }
+
+  #stats-panel {
+    width: 90%; /* Wide on mobile */
+    max-width: 400px;
+    margin-top: 10px;
+    margin-bottom: 40px;
+  }
+}
