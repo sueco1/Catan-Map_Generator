@@ -330,7 +330,7 @@ h1 {
   border-radius: 50%;
   transform: translate(-50%, -50%); /* Center strictly on the point */
   z-index: 50; /* Above tokens */
-  cursor: help;
+/*cursor: help;*/
   transition: all 0.2s ease;
   
   /* Flex to center the number */
