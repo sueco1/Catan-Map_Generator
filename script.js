@@ -34,10 +34,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // 4. Port Configuration
   // Key = Water Tile Index, Value = Rotation Angle (facing the land)
   const portPositions = {
-    0: 150, 2: 210,         // Top Left / Right
-    9: 270, 11: 270, 13: 330, // Right Side
-    16: 30, 14: 30,         // Bottom Right / Left
-    7: 90, 5: 90            // Left Side
+    0: 330,         // Top Left
+    2: 30,         // Top Right
+
+    6: 270,         // Left Top
+    10: 270,        // Left Bottom
+
+    5: 30,         // Right Top
+    9: 90,         // Right Middle
+    13: 150,        // Right Bottom
+
+    14: 210,         // Bottom Left
+    16: 150         // Bottom Right
   };
 
   // The mix of ports to shuffle
@@ -52,19 +60,23 @@ document.addEventListener("DOMContentLoaded", () => {
     0: [1, 3, 4],
     1: [0, 2, 4, 5],
     2: [1, 5, 6],
+
     3: [0, 4, 7, 8],
     4: [0, 1, 3, 5, 8, 9],
     5: [1, 2, 4, 6, 9, 10],
     6: [2, 5, 10, 11],
+
     7: [3, 8, 12],
     8: [3, 4, 7, 9, 12, 13],
     9: [4, 5, 8, 10, 13, 14],
     10: [5, 6, 9, 11, 14, 15],
     11: [6, 10, 15],
+
     12: [7, 8, 13, 16],
     13: [8, 9, 12, 14, 16, 17],
     14: [9, 10, 13, 15, 17, 18],
     15: [10, 11, 14, 18],
+
     16: [12, 13, 17],
     17: [13, 14, 16, 18],
     18: [14, 15, 17]

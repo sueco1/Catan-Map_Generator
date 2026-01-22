@@ -95,8 +95,8 @@ h1 {
 .sheep  { background-color: #8bc34a; } /* Light Green */
 .wheat  { background-color: #fbc02d; } /* Yellow */
 .ore    { background-color: #78909c; } /* Stone Grey */
-.desert { background-color: #d7ccc8; } /* Sand */
-.ocean  { background-color: #0288d1; opacity: 0.3; } /* Water placeholders */
+.desert { background-color: #c2b280; } /* Sand */
+.ocean  { background-color: #0288d1; opacity: 0.5; } /* Water placeholders */
 
 /* --- TOKEN (NUMBER CHIT) --- */
 .token {
@@ -175,12 +175,12 @@ h1 {
 }
 
 /* Port Specific Colors */
-.port-icon.wood  { background: #4caf50; color: white; }
-.port-icon.sheep { background: #8bc34a; color: white; }
-.port-icon.wheat { background: #ffeb3b; color: #333; }
-.port-icon.brick { background: #f44336; color: white; }
-.port-icon.ore   { background: #9e9e9e; color: white; }
-.port-icon.generic { background: #eee; color: #333; }
+.port-icon.wood  { background: #4caf50; color: black; }
+.port-icon.sheep { background: #8bc34a; color: black; }
+.port-icon.wheat { background: #ffeb3b; color: black; }
+.port-icon.brick { background: #f44336; color: black; }
+.port-icon.ore   { background: #9e9e9e; color: black; }
+.port-icon.generic { background: #eee; color: black; }
 
 /* Coordinates (Standard Spiral Layout) */
 /* Inner Ring */
