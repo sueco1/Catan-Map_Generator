@@ -1,7 +1,7 @@
 body {
   font-family: sans-serif;
   text-align: center;
-  background-color: #e0f7fa; /* Light blue sea background */
+  background-color: #e0f7fa; 
   margin: 0;
   padding: 20px;
 }
@@ -14,7 +14,7 @@ h1 {
 .controls {
   margin-bottom: 20px;
   display: flex;
-  flex-direction: column; /* Stack button and toggle on small screens */
+  flex-direction: column;
   align-items: center;
   gap: 15px;
 }
@@ -34,19 +34,28 @@ h1 {
   background-color: #004d40;
 }
 
+/* Container for the two toggles */
+.toggles-wrapper {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 /* Toggle Switch Styling */
 .toggle-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   font-size: 14px;
   color: #333;
   cursor: pointer;
   background: rgba(255,255,255,0.6);
-  padding: 8px 15px;
+  padding: 8px 12px;
   border-radius: 20px;
   user-select: none;
+  border: 1px solid rgba(0,0,0,0.05);
 }
 
 .toggle-container input {
@@ -59,7 +68,7 @@ h1 {
 /* --- HEXAGON STYLING --- */
 .hex {
   width: 100px;
-  height: 115px; /* approx 100 * 2/sqrt(3) */
+  height: 115px; 
   position: absolute;
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   display: flex;
@@ -68,23 +77,23 @@ h1 {
 }
 
 /* Terrain Colors */
-.wood   { background-color: #2e7d32; } /* Forest Green */
-.brick  { background-color: #d84315; } /* Clay Red */
-.sheep  { background-color: #8bc34a; } /* Light Green */
-.wheat  { background-color: #fbc02d; } /* Yellow */
-.ore    { background-color: #78909c; } /* Stone Grey */
-.desert { background-color: #c2b280; } /* Sand */
-.ocean  { background-color: #0288d1; opacity: 0.5; } /* Water placeholders */
+.wood   { background-color: #2e7d32; } 
+.brick  { background-color: #d84315; } 
+.sheep  { background-color: #8bc34a; } 
+.wheat  { background-color: #fbc02d; } 
+.ore    { background-color: #78909c; } 
+.desert { background-color: #c2b280; } 
+.ocean  { background-color: #0288d1; opacity: 0.5; } 
 
 /* --- TOKEN (NUMBER CHIT) --- */
 .token {
   width: 35px;
   height: 35px;
-  background-color: #fff8e1; /* Ivory */
+  background-color: #fff8e1; 
   border-radius: 50%;
   border: 1px solid #333;
   display: flex;
-  flex-direction: column; /* Stack Number on top of Pips */
+  flex-direction: column; 
   align-items: center;
   justify-content: center;
   font-family: 'Times New Roman', serif;
@@ -99,13 +108,13 @@ h1 {
 }
 
 .token-pips {
-  font-size: 14px; /* Dots size */
+  font-size: 14px; 
   line-height: 0.6;
   font-weight: bold;
-  letter-spacing: -1px; /* Bring dots closer */
+  letter-spacing: -1px; 
 }
 
-/* --- PORTS (UPDATED FOR V-SHAPE) --- */
+/* --- PORTS (V-SHAPE) --- */
 .port {
   width: 100%;
   height: 100%;
@@ -116,13 +125,12 @@ h1 {
   pointer-events: none; 
 }
 
-/* The V-Legs pointing to vertices */
 .port::before,
 .port::after {
   content: "";
   position: absolute;
   width: 4px;
-  height: 48px; /* Length to reach corners */
+  height: 48px; 
   background: #fff;
   top: 50%;
   left: 50%;
@@ -131,7 +139,6 @@ h1 {
   border-radius: 2px;
 }
 
-/* Rotate legs +/- 30 degrees to hit vertices */
 .port::before { transform: translate(-50%, 0) rotate(-30deg); }
 .port::after  { transform: translate(-50%, 0) rotate(30deg); }
 
@@ -152,7 +159,6 @@ h1 {
   position: relative; 
 }
 
-/* Port Specific Colors */
 .port-icon.wood  { background: #4caf50; color: black; }
 .port-icon.sheep { background: #8bc34a; color: black; }
 .port-icon.wheat { background: #ffeb3b; color: black; }
@@ -161,7 +167,6 @@ h1 {
 .port-icon.generic { background: #eee; color: black; }
 
 /* Coordinates (Standard Spiral Layout) */
-/* Inner Ring */
 .tile-0 { top: 150px; left: 250px; }
 .tile-1 { top: 150px; left: 350px; }
 .tile-2 { top: 150px; left: 450px; }
@@ -182,14 +187,11 @@ h1 {
 .tile-17{ top: 494px; left: 350px; }
 .tile-18{ top: 494px; left: 450px; }
 
-/* Water Tiles (Surrounding the island) */
-/* Top Row */
+/* Water Tiles */
 .water-0 { top: 64px; left: 200px; }
 .water-1 { top: 64px; left: 300px; }
 .water-2 { top: 64px; left: 400px; }
 .water-3 { top: 64px; left: 500px; }
-
-/* Sides */
 .water-4 { top: 150px; left: 150px; }
 .water-5 { top: 150px; left: 550px; }
 .water-6 { top: 236px; left: 100px; }
@@ -200,8 +202,6 @@ h1 {
 .water-11{ top: 408px; left: 600px; }
 .water-12{ top: 494px; left: 150px; }
 .water-13{ top: 494px; left: 550px; }
-
-/* Bottom Row */
 .water-14{ top: 580px; left: 200px; }
 .water-15{ top: 580px; left: 300px; }
 .water-16{ top: 580px; left: 400px; }
@@ -211,16 +211,13 @@ h1 {
 #board-container {
   position: relative;
   width: 100%;
-  /* Default Desktop Height */
   height: 850px; 
   overflow: hidden; 
   padding-top: 20px;
-  /* Centers the content in the container */
   display: block; 
 }
 
 #board {
-  /* Default Desktop State */
   position: relative; 
   width: 800px;
   height: 800px;
@@ -230,48 +227,32 @@ h1 {
 }
 
 /* --- RESPONSIVE SCALING --- */
-
-/* Tablets */
 @media (max-width: 850px) {
-  #board {
-    transform: scale(0.7); 
-  }
-  #board-container {
-    height: 600px; 
-  }
+  #board { transform: scale(0.7); }
+  #board-container { height: 600px; }
 }
 
-/* Phones - THE FIX */
 @media (max-width: 600px) {
   #board-container {
-    /* STRICT HEIGHT: Matches the scaled board size (800 * 0.42 = ~336) */
     height: 360px; 
-    padding: 0;
-    margin: 0;
-    overflow: hidden; /* Cuts off everything else */
+    padding: 0; margin: 0;
+    overflow: hidden; 
   }
-
   #board {
-    /* ABSOLUTE: Removes the 'ghost' 800px height from the page flow */
     position: absolute; 
-    top: 10px; /* Small gap from top */
-    
-    /* Center horizontally */
-    left: 50%; 
+    top: 10px; left: 50%; 
     margin-left: -400px; 
-    
-    /* Scale */
     transform-origin: top center;
     transform: scale(0.42); 
   }
 }
 
-/* --- GAME LAYOUT (Desktop) --- */
+/* --- GAME LAYOUT --- */
 .game-layout {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  gap: 40px; /* Space between board and graph */
+  gap: 40px; 
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -283,7 +264,7 @@ h1 {
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   width: 280px;
-  margin-top: 40px; /* Aligns visually with the board top */
+  margin-top: 40px; 
 }
 
 #stats-panel h3 {
@@ -298,17 +279,8 @@ h1 {
   margin-bottom: 12px;
 }
 
-.stat-label {
-  width: 50px;
-  font-weight: bold;
-  font-size: 14px;
-}
-
-.stat-value {
-  width: 30px;
-  text-align: right;
-  font-weight: bold;
-}
+.stat-label { width: 50px; font-weight: bold; font-size: 14px; }
+.stat-value { width: 30px; text-align: right; font-weight: bold; }
 
 .bar-container {
   flex-grow: 1;
@@ -321,12 +293,11 @@ h1 {
 
 .bar {
   height: 100%;
-  width: 0%; /* JS will change this */
+  width: 0%; 
   transition: width 0.5s ease;
   border-radius: 6px;
 }
 
-/* Bar Colors */
 .wood-bar { background-color: #228b22; }
 .brick-bar { background-color: #e34234; }
 .sheep-bar { background-color: #8bc34a; }
@@ -337,13 +308,12 @@ h1 {
 /* --- MOBILE ADJUSTMENTS --- */
 @media (max-width: 850px) {
   .game-layout {
-    flex-direction: column; /* Stack them */
+    flex-direction: column; 
     align-items: center;
     gap: 0;
   }
-
   #stats-panel {
-    width: 90%; /* Wide on mobile */
+    width: 90%; 
     max-width: 400px;
     margin-top: 10px;
     margin-bottom: 40px;
