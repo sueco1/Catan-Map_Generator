@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const genBtn = document.getElementById("gen-btn");
   const redRuleToggle = document.getElementById("red-rule-toggle");
   const fixedPortsToggle = document.getElementById("fixed-ports-toggle");
+  const noClumpToggle = document.getElementById("no-clump-toggle"); // <--- NEW TOGGLE
 
   // --- CONFIGURATION ---
 
@@ -57,6 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Check 1: Red Number Rule (No 6s or 8s touching)
   function hasBadNeighbor(tileIndex, currentNumber, currentTiles) {
     if (currentNumber !== 6 && currentNumber !== 8) return false;
     const neighbors = adjacency[tileIndex];
@@ -67,6 +69,23 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
     return false;
+  }
+
+  // Check 2: Clumping Rule (No Wood touching Wood, etc.)
+  function checkClumping(tiles) {
+    for (let tile of tiles) {
+      if (tile.terrain === "desert") continue; // Desert is safe
+      
+      const neighbors = adjacency[tile.id];
+      for (let neighborId of neighbors) {
+        const neighbor = tiles[neighborId];
+        // If neighbor is same terrain, we have a clump
+        if (neighbor.terrain === tile.terrain) {
+          return true; // Failed check
+        }
+      }
+    }
+    return false; // No clumps found
   }
 
   function updateStats(tiles) {
@@ -94,16 +113,20 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- MAIN GENERATOR ---
 
   genBtn.addEventListener("click", () => {
+    // Read Toggles
     const useRedRule = redRuleToggle ? redRuleToggle.checked : true;
     const useFixedPorts = fixedPortsToggle ? fixedPortsToggle.checked : false;
+    const useNoClumping = noClumpToggle ? noClumpToggle.checked : false;
 
     let validMapFound = false;
     let attemptCount = 0;
     let finalTiles = [];
 
-    // Retry Loop
-    while (!validMapFound && attemptCount < 1000) {
+    // Retry Loop (Increased limit because clumping + red rule is harder to solve)
+    while (!validMapFound && attemptCount < 5000) {
       attemptCount++;
+      
+      // 1. Setup & Shuffle Terrains
       let currentTerrains = [...terrains];
       shuffle(currentTerrains);
       
@@ -112,9 +135,20 @@ document.addEventListener("DOMContentLoaded", () => {
         tempTiles.push({ id: i, terrain: currentTerrains[i], number: null });
       }
 
+      // 2. CHECK: Terrain Clumping
+      // If user wants no clumping, we check immediately after placing terrains.
+      // If it fails, we 'continue' to restart the loop immediately.
+      if (useNoClumping) {
+        if (checkClumping(tempTiles)) {
+          continue; // Try again
+        }
+      }
+
+      // 3. Setup & Shuffle Numbers
       let currentNumbers = [...numbers];
       shuffle(currentNumbers);
 
+      // 4. Assign Numbers & Check Red Rule
       let mapIsValid = true;
       for (let tile of tempTiles) {
         if (tile.terrain === "desert") continue;
@@ -136,7 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (!validMapFound) {
-      alert("Could not find a valid map layout. Try again!");
+      alert(`Could not find a valid map in ${attemptCount} attempts. Try loosening the rules!`);
       return;
     }
 
@@ -146,19 +180,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 1. SETUP PORTS
     let currentPorts = [];
-
     if (useFixedPorts) {
-      // REVERSE ORDER because .pop() takes from the end
+      // Reversed standard order for .pop()
       currentPorts = [
-        "wood",     // Index 16
-        "generic",  // Index 14
-        "brick",    // Index 13
-        "wheat",    // Index 10
-        "generic",  // Index 9
-        "ore",      // Index 6
-        "generic",  // Index 5
-        "sheep",    // Index 2
-        "generic"   // Index 0
+        "wood", "generic", "brick", "wheat", "generic", "ore", "generic", "sheep", "generic"
       ];
     } else {
       currentPorts = [...portTypesSource];
@@ -181,10 +206,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const iconDiv = document.createElement("div");
         iconDiv.classList.add("port-icon", portType);
         
-        // --- ADDED TEXT LABEL BACK ---
         const textSpan = document.createElement("span");
         textSpan.classList.add("port-text");
-        // Counter-rotate text so it stays upright
         textSpan.style.transform = `rotate(${-rotation}deg)`; 
         textSpan.textContent = portType === "generic" ? "3:1" : "2:1";
         
