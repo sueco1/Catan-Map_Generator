@@ -209,47 +209,51 @@ h1 {
 
 /* --- BOARD CONTAINER --- */
 #board-container {
-  display: flex;
-  justify-content: center; /* Tries to center the board */
+  position: relative;
   width: 100%;
-  overflow: auto; /* IMPORTANT: Enables scrolling if it doesn't fit! */
-  padding-top: 10px;
-  padding-bottom: 50px; /* Extra space at bottom for scrolling */
+  /* Default height for desktop */
+  height: 850px; 
+  /* CUTS OFF the extra white space */
+  overflow: hidden; 
+  padding-top: 20px;
 }
 
 #board {
   position: relative;
-  /* The board is natively 800px wide based on your coordinate system */
-  width: 800px; 
+  width: 800px;
   height: 800px;
-  transform-origin: top center; 
-  transition: transform 0.3s ease; 
-  /* Ensures the board doesn't align weirdly inside the flex container */
-  flex-shrink: 0; 
+  /* Default Desktop Behavior */
+  transform-origin: top center;
+  transition: transform 0.3s ease;
+  margin: 0 auto; 
 }
 
 /* --- RESPONSIVE SCALING --- */
 
-/* Tablets (iPad, etc.) */
+/* Tablets */
 @media (max-width: 850px) {
   #board {
     transform: scale(0.7); 
-    margin-bottom: -200px; 
+  }
+  #board-container {
+    height: 600px; /* Adjusted height for tablets */
   }
 }
 
-/* Phones (Mobile) */
+/* Phones */
 @media (max-width: 600px) {
+  #board-container {
+    /* 800px * 0.42 = ~336px. We set 350px to fit it perfectly. */
+    height: 350px; 
+  }
+
   #board {
-    /* Fixed scale: 0.42 * 800px = 336px. 
-       This fits inside almost all phones (which are usually ~375px wide) */
+    /* Center the board */
+    left: 50%;
+    margin-left: -400px; 
+    
+    /* Scale from top */
+    transform-origin: top center;
     transform: scale(0.42); 
-    
-    /* Pulls the empty space at the bottom up */
-    margin-bottom: -450px; 
-    
-    /* Extra margin left ensures it doesn't get cut off on the left edge */
-    margin-left: auto;
-    margin-right: auto;
   }
 }
