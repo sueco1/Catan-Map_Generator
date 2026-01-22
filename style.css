@@ -60,35 +60,44 @@ h1 {
 #board-container {
   display: flex;
   justify-content: center;
+  align-items: flex-start; /* Aligns board to top */
   width: 100%;
-  overflow: hidden; /* Prevents scrolling bars if it barely fits */
-  padding-top: 10px;
+  overflow: hidden; /* Stops user from scrolling left/right */
+  padding-top: 20px;
+  min-height: 50vh; /* Ensures container has height */
 }
 
 #board {
   position: relative;
-  /* The board is natively 800x800 based on your coordinates */
-  width: 800px; 
+  width: 800px;  /* The board is natively 800px wide */
   height: 800px;
-  transform-origin: top center; /* Shrink from the top down */
-  transition: transform 0.3s ease; /* Smooth resizing */
+  transform-origin: top center; /* Shrink from the top-middle */
+  transition: transform 0.3s ease; 
 }
 
-/* --- RESPONSIVE SCALING --- */
+/* --- RESPONSIVE SCALING (THE FIX) --- */
 
-/* Tablets / Small Laptops */
+/* Tablets & Small Laptops (Screen width less than 850px) */
 @media (max-width: 850px) {
   #board {
-    transform: scale(0.7); /* 70% size */
-    margin-bottom: -200px; /* Remove empty whitespace below */
+    /* Scale down to 70% */
+    transform: scale(0.7); 
+    margin-bottom: -250px; /* Pull the bottom up */
   }
 }
 
-/* Phones (Portrait) */
-@media (max-width: 500px) {
+/* Phones (Screen width less than 600px) */
+/* We increased this number to catch larger phones */
+@media (max-width: 600px) {
   #board {
-    transform: scale(0.42); /* 42% size - fits standard phones (~340px width) */
-    margin-bottom: -450px; /* Remove the huge gap left by shrinking */
+    /* DYNAMIC SCALING:
+       Calculates scale based on screen width.
+       (Screen Width - 20px padding) divided by 800px Board Width 
+    */
+    transform: scale(calc((100vw - 20px) / 800));
+    
+    /* Pull the footer up so there isn't empty white space */
+    margin-bottom: -450px; 
   }
 }
 
