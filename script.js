@@ -1,11 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
   const boardDiv = document.getElementById("board");
   const genBtn = document.getElementById("gen-btn");
-  const redRuleToggle = document.getElementById("red-rule-toggle");
-  const fixedPortsToggle = document.getElementById("fixed-ports-toggle");
+  const toggleBtn = document.getElementById("red-rule-toggle");
 
   // --- CONFIGURATION ---
-
   const terrains = [
     "desert",
     "ore", "ore", "ore",
@@ -28,37 +26,14 @@ document.addEventListener("DOMContentLoaded", () => {
     6: 5, 8: 5
   };
 
-  // 4. Port Configuration
-  // Positions (Water Tile Index -> Rotation)
-  // The ORDER here follows the clockwise spiral from top-left
   const portPositions = {
-    0: 330,  // Top Left
-    2: 30,   // Top Right
-    5: 30,   // Right Top
-    9: 90,   // Right Middle
-    13: 150, // Right Bottom
-    16: 150, // Bottom Right
-    14: 210, // Bottom Left
-    10: 270, // Left Bottom
-    6: 270   // Left Top
+    0: 330,  2: 30,
+    6: 270,  10: 270,
+    5: 30,   9: 90,   13: 150,
+    14: 210, 16: 150
   };
 
-  // STANDARD PORT ORDER (Clockwise from Top Left)
-  // Based on standard board setup
-  const standardPorts = [
-    "generic", // 0
-    "sheep",   // 2
-    "generic", // 5
-    "generic", // 9
-    "brick",   // 13
-    "wood",    // 16
-    "generic", // 14
-    "wheat",   // 10
-    "ore"      // 6
-  ];
-
-  // Random Source
-  const randomPortsSource = [
+  const portTypesSource = [
     "wood", "brick", "sheep", "wheat", "ore",
     "generic", "generic", "generic", "generic"
   ];
@@ -72,7 +47,6 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // --- HELPERS ---
-
   function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -86,9 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let neighborId of neighbors) {
       const neighbor = currentTiles[neighborId];
       if (neighbor && neighbor.number !== null) {
-        if (neighbor.number === 6 || neighbor.number === 8) {
-          return true;
-        }
+        if (neighbor.number === 6 || neighbor.number === 8) return true;
       }
     }
     return false;
@@ -104,7 +76,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     });
-
     const maxPips = 18; 
     for (const [resource, count] of Object.entries(counts)) {
       const valEl = document.getElementById(`val-${resource}`);
@@ -118,12 +89,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --- MAIN GENERATOR ---
-
   genBtn.addEventListener("click", () => {
-    const useRedRule = redRuleToggle ? redRuleToggle.checked : true;
-    const useFixedPorts = fixedPortsToggle ? fixedPortsToggle.checked : false;
-
-    // 1. GENERATE TILES (Logic unchanged)
+    const useRedRule = toggleBtn ? toggleBtn.checked : true;
     let validMapFound = false;
     let attemptCount = 0;
     let finalTiles = [];
@@ -170,49 +137,18 @@ document.addEventListener("DOMContentLoaded", () => {
     boardDiv.innerHTML = "";
     updateStats(finalTiles);
 
-    // 2. SETUP PORTS
-    let finalPorts = [];
-    
-    if (useFixedPorts) {
-      // Use standard list. Reverse it because we use .pop() (LIFO)
-      // Standard order is 0->2->5..., but .pop() takes the last one first.
-      // So we reverse it so the first item (Index 0) is at the end of array.
-      finalPorts = [...standardPorts].reverse();
-    } else {
-      // Shuffle random ports
-      finalPorts = [...randomPortsSource];
-      shuffle(finalPorts);
-    }
+    // 1. Ports
+    const currentPorts = [...portTypesSource];
+    shuffle(currentPorts);
 
-    // 3. RENDER PORTS (Specific Iteration Order)
-    // We must iterate through the water tiles in the specific order defined in portPositions
-    // To ensure "Fixed Ports" appear in the correct clockwise slots.
-    
-    // The keys of portPositions are [0, 2, 5, 9, 13, 16, 14, 10, 6] (roughly)
-    // We need to loop 0..17 for rendering, but check against positions.
-    
-    // Actually, because portPositions is an Object, order isn't guaranteed in loop.
-    // But since we map Index -> Rotation, we just need to make sure we assign 
-    // the popped port to the correct index based on our "Clockwise" logic.
-    
-    // Let's create a specific order array for the water tiles that HAVE ports
-    const waterTilesWithPorts = [0, 2, 5, 9, 13, 16, 14, 10, 6];
-
-    // Create a map of Index -> PortType for easy rendering
-    const assignedPorts = {};
-    waterTilesWithPorts.forEach(waterIndex => {
-        assignedPorts[waterIndex] = finalPorts.pop(); // Take from stack
-    });
-
-    // RENDER WATER
+    // 2. Render Water & Ports (Standard loop 0-17)
     for (let i = 0; i < 18; i++) {
       const div = document.createElement("div");
       div.classList.add("hex", "ocean", `water-${i}`);
 
       if (portPositions.hasOwnProperty(i)) {
+        const portType = currentPorts.pop();
         const rotation = portPositions[i];
-        const portType = assignedPorts[i]; // Get the assigned type
-
         const portDiv = document.createElement("div");
         portDiv.classList.add("port");
         portDiv.style.transform = `rotate(${rotation}deg)`;
@@ -232,7 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
       boardDiv.appendChild(div);
     }
 
-    // 4. RENDER LAND
+    // 3. Render Land
     finalTiles.forEach(tile => {
       const div = document.createElement("div");
       div.classList.add("hex", tile.terrain, `tile-${tile.id}`);

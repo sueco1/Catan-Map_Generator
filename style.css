@@ -1,6 +1,6 @@
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f0f2f5;
+  background-color: #e0f7fa; /* Light blue background */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -10,69 +10,62 @@ body {
 }
 
 h1 {
-  color: #333;
+  color: #000;
   margin-bottom: 10px;
   text-align: center;
+  font-weight: 700;
 }
 
-/* --- CONTROLS SECTION --- */
+/* --- CONTROLS --- */
 .controls {
-  margin: 20px 0;
+  margin: 10px 0 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
-  width: 100%;
+  gap: 15px;
 }
 
 #gen-btn {
   padding: 12px 24px;
   font-size: 18px;
-  background-color: #007bff;
+  background-color: #004d40;
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 #gen-btn:hover {
-  background-color: #0056b3;
+  background-color: #00695c;
 }
 
-/* Container for the two toggles */
-.toggles-container {
-  display: flex;
-  gap: 30px; /* Space between the two toggles */
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
+/* Single Toggle Styling */
 .toggle-wrapper {
+  background: white;
+  padding: 8px 20px;
+  border-radius: 30px;
   display: flex;
   align-items: center;
   gap: 10px;
-  background: white;
-  padding: 8px 15px;
-  border-radius: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .toggle-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #444;
+  font-size: 16px;
+  color: #333;
+  font-weight: 500;
 }
 
-/* Switch Styling */
+/* The Switch Box */
 .switch {
   position: relative;
   display: inline-block;
-  width: 50px;
-  height: 24px;
+  width: 26px;
+  height: 26px; /* Just a checkbox square for this style, or standard switch */
 }
 
+/* Custom Checkbox Look (Red Square Style from your image) */
 .switch input {
   opacity: 0;
   width: 0;
@@ -85,13 +78,14 @@ h1 {
   top: 0; left: 0; right: 0; bottom: 0;
   background-color: #ccc;
   transition: .4s;
+  border-radius: 4px; /* Slightly rounded square */
 }
 
 .slider:before {
   position: absolute;
   content: "";
-  height: 16px;
-  width: 16px;
+  height: 18px;
+  width: 18px;
   left: 4px;
   bottom: 4px;
   background-color: white;
@@ -99,77 +93,65 @@ h1 {
 }
 
 input:checked + .slider {
-  background-color: #2196F3;
-}
-
-input:checked + .slider:before {
-  transform: translateX(26px);
+  background-color: #d32f2f; /* Red when checked */
 }
 
 .slider.round {
-  border-radius: 34px;
+  border-radius: 4px; 
 }
 
-.slider.round:before {
-  border-radius: 50%;
-}
 
 /* --- GAME LAYOUT (Desktop) --- */
 .game-layout {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  gap: 40px;
+  gap: 50px;
   width: 100%;
   max-width: 1200px;
-  margin-top: 20px;
 }
 
 /* --- STATS PANEL --- */
 #stats-panel {
-  background: white;
+  background: rgba(255, 255, 255, 0.8);
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  width: 280px;
-  /* Aligns visually with the board top */
-  margin-top: 20px; 
+  width: 250px;
+  margin-top: 40px; 
 }
 
 #stats-panel h3 {
   margin-top: 0;
   text-align: center;
-  color: #333;
+  font-size: 16px;
   margin-bottom: 15px;
-  font-size: 18px;
 }
 
 .stat-row {
   display: flex;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .stat-label {
   width: 50px;
   font-weight: bold;
-  font-size: 14px;
-  color: #555;
+  font-size: 13px;
 }
 
 .stat-value {
-  width: 30px;
+  width: 25px;
   text-align: right;
   font-weight: bold;
-  font-size: 14px;
-  color: #333;
+  font-size: 13px;
 }
 
 .bar-container {
   flex-grow: 1;
-  background: #f0f0f0;
-  height: 10px;
-  border-radius: 5px;
+  background: #eee;
+  height: 8px;
+  border-radius: 4px;
   margin: 0 10px;
   overflow: hidden;
 }
@@ -178,23 +160,21 @@ input:checked + .slider:before {
   height: 100%;
   width: 0%;
   transition: width 0.5s ease;
-  border-radius: 5px;
 }
 
+/* Colors */
 .wood-bar { background-color: #228b22; }
 .brick-bar { background-color: #e34234; }
 .sheep-bar { background-color: #8bc34a; }
 .wheat-bar { background-color: #fdd835; }
 .ore-bar { background-color: #78909c; }
 
+
 /* --- BOARD CONTAINER --- */
 #board-container {
   position: relative;
-  /* Default Desktop Height */
   height: 850px; 
-  /* Allows width to be flexible but not smaller than board */
-  min-width: 800px; 
-  padding-top: 20px;
+  min-width: 800px;
   display: block;
 }
 
@@ -207,19 +187,18 @@ input:checked + .slider:before {
   margin: 0 auto; 
 }
 
-/* Hexagon & Token Styles */
+/* Hexagons */
 .hex {
   position: absolute;
   width: 150px;
   height: 173.2px;
-  background-size: cover;
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* Token Styles */
+/* Tokens */
 .token {
   width: 50px;
   height: 50px;
@@ -229,41 +208,38 @@ input:checked + .slider:before {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
   z-index: 10;
-  color: #333;
+  color: #000;
 }
 
-.token-number {
-  font-size: 18px;
-  font-weight: bold;
-  line-height: 1;
-}
+.token-number { font-size: 18px; font-weight: bold; line-height: 1; }
+.token-pips { font-size: 14px; line-height: 0.5; margin-top: 3px; font-weight: bold; }
 
-.token-pips {
-  font-size: 12px;
-  line-height: 0.5;
-  margin-top: 2px;
-  letter-spacing: 1px;
-}
+/* Colors */
+.wood { background-color: #7cb342; } /* Lighter green */
+.brick { background-color: #d84315; } /* Burnt orange */
+.sheep { background-color: #aed581; } /* Light green */
+.wheat { background-color: #fdd835; } /* Yellow */
+.ore { background-color: #546e7a; }   /* Blue-grey */
+.desert { background-color: #d7ccc8; }
+.ocean { background-color: #4fc3f7; }
 
-/* Port Styles */
+/* Ports */
 .port {
   position: absolute;
   width: 100%;
   height: 100%;
   pointer-events: none;
 }
-
 .port-icon {
   position: absolute;
-  top: -25px;
+  top: -20px;
   left: 50%;
   transform: translateX(-50%);
-  width: 40px;
-  height: 40px;
-  background-color: white;
-  border: 2px solid #333;
+  width: 36px;
+  height: 36px;
+  background-color: #fff;
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -273,128 +249,83 @@ input:checked + .slider:before {
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   z-index: 5;
 }
-
-/* Resource Colors */
-.wood { background-color: #228b22; }
-.brick { background-color: #e34234; }
-.sheep { background-color: #8bc34a; }
-.wheat { background-color: #fdd835; }
-.ore { background-color: #78909c; }
-.desert { background-color: #d7ccc8; }
-.ocean { background-color: #4fc3f7; }
-
-/* Port Colors */
-.port-icon.wood { background-color: #228b22; color: white; }
-.port-icon.brick { background-color: #e34234; color: white; }
-.port-icon.sheep { background-color: #8bc34a; color: white; }
+.port-text { display: block; }
+.port-icon.wood { background-color: #7cb342; color: white; }
+.port-icon.brick { background-color: #d84315; color: white; }
+.port-icon.sheep { background-color: #aed581; color: white; }
 .port-icon.wheat { background-color: #fdd835; color: #333; }
-.port-icon.ore { background-color: #78909c; color: white; }
+.port-icon.ore { background-color: #546e7a; color: white; }
 .port-icon.generic { background-color: #e0e0e0; color: #333; }
 
-/* --- COORDINATES (Positions) --- */
-/* (Truncated for brevity, but these remain unchanged from your existing file) */
+
+/* --- COORDINATES --- */
 /* Row 1 */
 .water-0 { top: 0; left: 175px; }
 .water-1 { top: 0; left: 325px; }
 .water-2 { top: 0; left: 475px; }
-
 /* Row 2 */
 .water-3 { top: 129px; left: 100px; }
 .tile-0  { top: 129px; left: 250px; }
 .tile-1  { top: 129px; left: 400px; }
 .water-4 { top: 129px; left: 550px; }
-
 /* Row 3 */
 .water-5 { top: 258px; left: 25px; }
 .tile-2  { top: 258px; left: 175px; }
 .tile-3  { top: 258px; left: 325px; }
 .tile-4  { top: 258px; left: 475px; }
 .water-6 { top: 258px; left: 625px; }
-
 /* Row 4 */
 .water-7 { top: 387px; left: 25px; }
 .tile-5  { top: 387px; left: 175px; }
 .tile-6  { top: 387px; left: 325px; }
 .tile-7  { top: 387px; left: 475px; }
 .water-8 { top: 387px; left: 625px; }
-
 /* Row 5 */
 .water-9 { top: 516px; left: 25px; }
 .tile-8  { top: 516px; left: 175px; }
 .tile-9  { top: 516px; left: 325px; }
 .tile-10 { top: 516px; left: 475px; }
 .water-10{ top: 516px; left: 625px; }
-
 /* Row 6 */
 .water-11{ top: 645px; left: 100px; }
 .tile-11 { top: 645px; left: 250px; }
 .tile-12 { top: 645px; left: 400px; }
 .water-12{ top: 645px; left: 550px; }
-
 /* Row 7 */
 .water-13{ top: 774px; left: 175px; }
 .water-14{ top: 774px; left: 325px; }
 .water-15{ top: 774px; left: 475px; }
-/* Tiles 13-18 are actually mapped to ids 0-18 in JS logic, 
-   but visually you used 0-12 in CSS above. 
-   Assuming your grid logic is correct, I will leave the coordinate block as you had it. 
-   If you need the full 19 tiles coordinates, ensure they match your existing setup. 
-*/
 
-/* --- RESPONSIVE SCALING --- */
+/* --- RESPONSIVE --- */
 
 /* Tablets */
 @media (max-width: 850px) {
   .game-layout {
-    flex-direction: column; /* Stack Graph below Board */
+    flex-direction: column; 
     align-items: center;
-    margin-top: 0;
   }
-
-  #board {
-    transform: scale(0.7); 
-  }
-  
-  #board-container {
-    height: 600px; 
-    min-width: 100%; /* Reset min-width for tablet */
-  }
-
-  #stats-panel {
-    width: 80%; /* Wider on tablet */
-    max-width: 500px;
-    margin-top: 0;
-    margin-bottom: 40px;
-  }
+  #board { transform: scale(0.7); }
+  #board-container { height: 600px; min-width: 100%; }
+  #stats-panel { width: 80%; max-width: 500px; margin-top: 0; margin-bottom: 40px; }
 }
 
 /* Phones */
 @media (max-width: 600px) {
-  /* Fix Container Height */
   #board-container {
-    height: 360px; /* Locked height */
-    padding: 0;
-    margin: 0;
+    height: 360px; 
+    padding: 0; margin: 0;
     overflow: hidden; 
-    width: 100%;
-    min-width: 0;
+    width: 100%; min-width: 0;
   }
-
   #board {
     position: absolute; 
-    top: 10px; 
-    left: 50%; 
-    margin-left: -400px; /* Center hack */
+    top: 10px; left: 50%; 
+    margin-left: -400px; 
     transform-origin: top center;
     transform: scale(0.42); 
   }
-
-  /* Fix Stats Panel on Mobile */
   #stats-panel {
-    width: 90%; 
-    max-width: 350px;
-    margin-top: 20px; /* Give space below the board */
-    margin-bottom: 50px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    width: 90%; max-width: 350px;
+    margin-top: 20px; margin-bottom: 50px;
   }
 }
