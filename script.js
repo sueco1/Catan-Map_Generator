@@ -29,6 +29,30 @@ document.addEventListener("DOMContentLoaded", () => {
     6: 5, 8: 5
   };
 
+  // Coordinates matched to CSS .tile-X (top, left)
+  // Hex size: 100 x 115
+  const tileCoordinates = [
+    { id: 0,  top: 150, left: 250 },
+    { id: 1,  top: 150, left: 350 },
+    { id: 2,  top: 150, left: 450 },
+    { id: 3,  top: 236, left: 200 },
+    { id: 4,  top: 236, left: 300 },
+    { id: 5,  top: 236, left: 400 },
+    { id: 6,  top: 236, left: 500 },
+    { id: 7,  top: 322, left: 150 },
+    { id: 8,  top: 322, left: 250 },
+    { id: 9,  top: 322, left: 350 },
+    { id: 10, top: 322, left: 450 },
+    { id: 11, top: 322, left: 550 },
+    { id: 12, top: 408, left: 200 },
+    { id: 13, top: 408, left: 300 },
+    { id: 14, top: 408, left: 400 },
+    { id: 15, top: 408, left: 500 },
+    { id: 16, top: 494, left: 250 },
+    { id: 17, top: 494, left: 350 },
+    { id: 18, top: 494, left: 450 }
+  ];
+
   const portPositions = {
     0: 330,  2: 30,
     6: 270,  10: 270,
@@ -58,7 +82,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Check 1: Red Number Rule (No 6s or 8s touching)
   function hasBadNeighbor(tileIndex, currentNumber, currentTiles) {
     if (currentNumber !== 6 && currentNumber !== 8) return false;
     const neighbors = adjacency[tileIndex];
@@ -71,42 +94,32 @@ document.addEventListener("DOMContentLoaded", () => {
     return false;
   }
 
-  // Check 2: Clumping Rule (Allows groups of 2, but rejects 3+)
   function checkClumping(tiles) {
     const visited = new Set();
-
     for (let i = 0; i < 19; i++) {
-      // Skip if already checked or if it's the desert
       if (visited.has(i)) continue;
       if (tiles[i].terrain === "desert") continue;
-
-      // Start a "Flood Fill" to find the size of this resource group
+      
       let groupSize = 0;
       let queue = [i];
       visited.add(i);
       let resourceType = tiles[i].terrain;
 
       while (queue.length > 0) {
-        let currentId = queue.pop(); // Remove from queue
+        let currentId = queue.pop();
         groupSize++;
-
-        // Check all neighbors
         let neighbors = adjacency[currentId];
         for (let nId of neighbors) {
-          // If neighbor is same type and not visited yet, add to group
           if (!visited.has(nId) && tiles[nId].terrain === resourceType) {
             visited.add(nId);
             queue.push(nId);
           }
         }
       }
-
-      // Logic: If we found a group bigger than 2, the map is bad.
-      if (groupSize > 2) {
-        return true; // Clump detected!
-      }
+      // Allow pairs, but fail on 3+
+      if (groupSize > 2) return true;
     }
-    return false; // All groups are size 1 or 2
+    return false;
   }
 
   function updateStats(tiles) {
@@ -131,10 +144,66 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // --- NEW: INTERSECTION CALCULATOR ---
+  function renderIntersections(tiles) {
+    // 1. Define corners relative to top-left of a 100x115 hex
+    // Based on CSS clip-path: 50% 0, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%
+    const offsets = [
+      { x: 50, y: 0 },    // Top
+      { x: 100, y: 29 },  // Top Right (approx 25%)
+      { x: 100, y: 86 },  // Bottom Right (approx 75%)
+      { x: 50, y: 115 },  // Bottom
+      { x: 0, y: 86 },    // Bottom Left
+      { x: 0, y: 29 }     // Top Left
+    ];
+
+    // Map "x,y" string -> total pips
+    const intersectionMap = {};
+
+    tiles.forEach(tile => {
+      if (tile.terrain === "desert" || tile.number === null) return;
+      
+      const pips = pipMap[tile.number];
+      const coords = tileCoordinates[tile.id]; // Get {top, left}
+
+      offsets.forEach(offset => {
+        // Calculate absolute pixel position
+        const absX = Math.round(coords.left + offset.x);
+        const absY = Math.round(coords.top + offset.y);
+        
+        // Create a unique key (allow small tolerance for float rounding if needed, 
+        // but Math.round usually snaps them to the same grid pixel)
+        // We round to nearest 5 pixels to snap neighboring corners together
+        const snapX = Math.round(absX / 5) * 5;
+        const snapY = Math.round(absY / 5) * 5;
+        const key = `${snapX},${snapY}`;
+
+        if (!intersectionMap[key]) {
+          intersectionMap[key] = { x: snapX, y: snapY, score: 0 };
+        }
+        intersectionMap[key].score += pips;
+      });
+    });
+
+    // Render the dots
+    for (const key in intersectionMap) {
+      const data = intersectionMap[key];
+      // Only show meaningful intersections (e.g. score > 0)
+      if (data.score > 0) {
+        const dot = document.createElement("div");
+        dot.classList.add("intersection");
+        dot.style.left = `${data.x}px`;
+        dot.style.top = `${data.y}px`;
+        dot.textContent = data.score;
+        dot.dataset.pips = data.score; // For CSS coloring
+        boardDiv.appendChild(dot);
+      }
+    }
+  }
+
   // --- MAIN GENERATOR ---
 
   genBtn.addEventListener("click", () => {
-    // Read Toggles
     const useRedRule = redRuleToggle ? redRuleToggle.checked : true;
     const useFixedPorts = fixedPortsToggle ? fixedPortsToggle.checked : false;
     const useNoClumping = noClumpToggle ? noClumpToggle.checked : false;
@@ -143,12 +212,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let attemptCount = 0;
     let finalTiles = [];
 
-    // Retry Loop
-    // Increased to 5000 because strict rules make valid maps rarer
     while (!validMapFound && attemptCount < 5000) {
       attemptCount++;
-      
-      // 1. Setup & Shuffle Terrains
       let currentTerrains = [...terrains];
       shuffle(currentTerrains);
       
@@ -157,18 +222,11 @@ document.addEventListener("DOMContentLoaded", () => {
         tempTiles.push({ id: i, terrain: currentTerrains[i], number: null });
       }
 
-      // 2. CHECK: Terrain Clumping
-      if (useNoClumping) {
-        if (checkClumping(tempTiles)) {
-          continue; // Failed clumping check, restart loop
-        }
-      }
+      if (useNoClumping && checkClumping(tempTiles)) continue;
 
-      // 3. Setup & Shuffle Numbers
       let currentNumbers = [...numbers];
       shuffle(currentNumbers);
 
-      // 4. Assign Numbers & Check Red Rule
       let mapIsValid = true;
       for (let tile of tempTiles) {
         if (tile.terrain === "desert") continue;
@@ -190,7 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (!validMapFound) {
-      alert(`Could not find a valid map in ${attemptCount} attempts. Try loosening the rules!`);
+      alert("Could not find a valid map. Try again!");
       return;
     }
 
@@ -201,7 +259,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // 1. SETUP PORTS
     let currentPorts = [];
     if (useFixedPorts) {
-      // Reversed standard order for .pop()
       currentPorts = [
         "wood", "generic", "brick", "wheat", "generic", "ore", "generic", "sheep", "generic"
       ];
@@ -263,5 +320,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       boardDiv.appendChild(div);
     });
+
+    // 4. Render Intersections (The new feature)
+    renderIntersections(finalTiles);
   });
 });

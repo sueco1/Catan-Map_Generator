@@ -319,3 +319,43 @@ h1 {
     margin-bottom: 40px;
   }
 }
+
+/* --- INTERSECTION MARKERS (Pip Score) --- */
+.intersection {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: rgba(255, 255, 255, 0.4); /* Faint white dot */
+  border: 1px solid rgba(0,0,0,0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%); /* Center strictly on the point */
+  z-index: 50; /* Above tokens */
+  cursor: help;
+  transition: all 0.2s ease;
+  
+  /* Flex to center the number */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0; /* Hide text normally */
+}
+
+.intersection:hover {
+  width: 30px;
+  height: 30px;
+  background-color: #fff;
+  border-color: #333;
+  box-shadow: 0 0 5px rgba(0,0,0,0.5);
+  font-size: 14px;
+  font-weight: bold;
+  color: #000;
+  z-index: 60;
+}
+
+/* Optional: Color code high value spots on hover */
+.intersection:hover[data-pips="10"],
+.intersection:hover[data-pips="11"], 
+.intersection:hover[data-pips="12"],
+.intersection:hover[data-pips="13"] {
+  background-color: #ffeb3b; /* Gold for high value */
+}
