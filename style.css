@@ -60,21 +60,35 @@ h1 {
 #board-container {
   display: flex;
   justify-content: center;
-  overflow: auto; /* Allow scrolling if it gets too big on small phones */
-  padding: 20px;
+  width: 100%;
+  overflow: hidden; /* Prevents scrolling bars if it barely fits */
+  padding-top: 10px;
 }
 
 #board {
   position: relative;
-  width: 800px;  /* Fixed size canvas for the layout */
+  /* The board is natively 800x800 based on your coordinates */
+  width: 800px; 
   height: 800px;
-  /* Scale down for smaller screens */
-  transform-origin: top center;
+  transform-origin: top center; /* Shrink from the top down */
+  transition: transform 0.3s ease; /* Smooth resizing */
 }
 
-@media (max-width: 800px) {
+/* --- RESPONSIVE SCALING --- */
+
+/* Tablets / Small Laptops */
+@media (max-width: 850px) {
   #board {
-    transform: scale(0.6); /* Shrink for phones */
+    transform: scale(0.7); /* 70% size */
+    margin-bottom: -200px; /* Remove empty whitespace below */
+  }
+}
+
+/* Phones (Portrait) */
+@media (max-width: 500px) {
+  #board {
+    transform: scale(0.42); /* 42% size - fits standard phones (~340px width) */
+    margin-bottom: -450px; /* Remove the huge gap left by shrinking */
   }
 }
 
