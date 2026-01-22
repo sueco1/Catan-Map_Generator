@@ -359,3 +359,36 @@ h1 {
 .intersection:hover[data-pips="13"] {
   background-color: #ffeb3b; /* Gold for high value */
 }
+
+/* --- HARBORMASTER HIGHLIGHTS --- */
+
+/* 1. When the board is in 'highlight mode', dim EVERYTHING first */
+.board-dimmed .hex {
+  opacity: 0.3;
+  filter: grayscale(80%);
+  transition: all 0.3s ease;
+}
+
+/* 2. ...Except the specific tiles we want to see */
+.board-dimmed .hex.highlight-target {
+  opacity: 1;
+  filter: grayscale(0%);
+  transform: scale(1.1); /* Pop out slightly */
+  z-index: 20;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+  border-radius: 50%; /* Soft glow */
+}
+
+/* 3. Keep the tokens bright on highlighted tiles */
+.board-dimmed .hex.highlight-target .token {
+  background-color: #fff;
+  border-color: #000;
+  transform: scale(1.1);
+}
+
+/* 4. Keep the port being hovered fully visible */
+.board-dimmed .port.active-port {
+  opacity: 1;
+  z-index: 30;
+  transform: scale(1.2);
+}

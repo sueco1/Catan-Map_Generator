@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Coordinates matched to CSS .tile-X (top, left)
-  // Hex size: 100 x 115
+  // Used for Intersection Calculation
   const tileCoordinates = [
     { id: 0,  top: 150, left: 250 },
     { id: 1,  top: 150, left: 350 },
@@ -82,6 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Rule: No 6s or 8s touching
   function hasBadNeighbor(tileIndex, currentNumber, currentTiles) {
     if (currentNumber !== 6 && currentNumber !== 8) return false;
     const neighbors = adjacency[tileIndex];
@@ -94,6 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return false;
   }
 
+  // Rule: Flood Fill check to prevent groups of 3+ same resources
   function checkClumping(tiles) {
     const visited = new Set();
     for (let i = 0; i < 19; i++) {
@@ -116,12 +118,13 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         }
       }
-      // Allow pairs, but fail on 3+
+      // Allow pairs (2), but fail on 3+
       if (groupSize > 2) return true;
     }
     return false;
   }
 
+  // Update the stats bars below the board
   function updateStats(tiles) {
     const counts = { wood: 0, brick: 0, sheep: 0, wheat: 0, ore: 0 };
     tiles.forEach(tile => {
@@ -144,36 +147,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- NEW: INTERSECTION CALCULATOR ---
+  // Feature: Render Intersection Pip Scores
   function renderIntersections(tiles) {
-    // 1. Define corners relative to top-left of a 100x115 hex
-    // Based on CSS clip-path: 50% 0, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%
     const offsets = [
-      { x: 50, y: 0 },    // Top
-      { x: 100, y: 29 },  // Top Right (approx 25%)
-      { x: 100, y: 86 },  // Bottom Right (approx 75%)
-      { x: 50, y: 115 },  // Bottom
-      { x: 0, y: 86 },    // Bottom Left
-      { x: 0, y: 29 }     // Top Left
+      { x: 50, y: 0 }, { x: 100, y: 29 }, { x: 100, y: 86 }, 
+      { x: 50, y: 115 }, { x: 0, y: 86 }, { x: 0, y: 29 }
     ];
 
-    // Map "x,y" string -> total pips
     const intersectionMap = {};
 
     tiles.forEach(tile => {
       if (tile.terrain === "desert" || tile.number === null) return;
-      
       const pips = pipMap[tile.number];
-      const coords = tileCoordinates[tile.id]; // Get {top, left}
+      const coords = tileCoordinates[tile.id];
 
       offsets.forEach(offset => {
-        // Calculate absolute pixel position
         const absX = Math.round(coords.left + offset.x);
         const absY = Math.round(coords.top + offset.y);
-        
-        // Create a unique key (allow small tolerance for float rounding if needed, 
-        // but Math.round usually snaps them to the same grid pixel)
-        // We round to nearest 5 pixels to snap neighboring corners together
+        // Snap to grid to handle slight rounding differences
         const snapX = Math.round(absX / 5) * 5;
         const snapY = Math.round(absY / 5) * 5;
         const key = `${snapX},${snapY}`;
@@ -185,17 +176,15 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // Render the dots
     for (const key in intersectionMap) {
       const data = intersectionMap[key];
-      // Only show meaningful intersections (e.g. score > 0)
       if (data.score > 0) {
         const dot = document.createElement("div");
         dot.classList.add("intersection");
         dot.style.left = `${data.x}px`;
         dot.style.top = `${data.y}px`;
         dot.textContent = data.score;
-        dot.dataset.pips = data.score; // For CSS coloring
+        dot.dataset.pips = data.score;
         boardDiv.appendChild(dot);
       }
     }
@@ -204,6 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- MAIN GENERATOR ---
 
   genBtn.addEventListener("click", () => {
+    // 1. Read Toggles
     const useRedRule = redRuleToggle ? redRuleToggle.checked : true;
     const useFixedPorts = fixedPortsToggle ? fixedPortsToggle.checked : false;
     const useNoClumping = noClumpToggle ? noClumpToggle.checked : false;
@@ -212,6 +202,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let attemptCount = 0;
     let finalTiles = [];
 
+    // 2. Generation Loop (Retry until rules are met)
     while (!validMapFound && attemptCount < 5000) {
       attemptCount++;
       let currentTerrains = [...terrains];
@@ -222,6 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
         tempTiles.push({ id: i, terrain: currentTerrains[i], number: null });
       }
 
+      // Check Clumping
       if (useNoClumping && checkClumping(tempTiles)) continue;
 
       let currentNumbers = [...numbers];
@@ -233,6 +225,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const num = currentNumbers.pop();
         tile.number = num;
 
+        // Check Red Rule
         if (useRedRule) {
           if (hasBadNeighbor(tile.id, num, tempTiles)) {
             mapIsValid = false;
@@ -256,7 +249,7 @@ document.addEventListener("DOMContentLoaded", () => {
     boardDiv.innerHTML = "";
     updateStats(finalTiles);
 
-    // 1. SETUP PORTS
+    // A. Setup Port Array
     let currentPorts = [];
     if (useFixedPorts) {
       currentPorts = [
@@ -267,7 +260,7 @@ document.addEventListener("DOMContentLoaded", () => {
       shuffle(currentPorts);
     }
 
-    // 2. Render Water & Ports
+    // B. Render Water & Ports (with Harbormaster Logic)
     for (let i = 0; i < 18; i++) {
       const div = document.createElement("div");
       div.classList.add("hex", "ocean", `water-${i}`);
@@ -280,6 +273,39 @@ document.addEventListener("DOMContentLoaded", () => {
         portDiv.classList.add("port");
         portDiv.style.transform = `rotate(${rotation}deg)`;
         
+        // --- HARBORMASTER EVENTS ---
+        portDiv.addEventListener("mouseenter", () => {
+          boardDiv.classList.add("board-dimmed");
+          portDiv.classList.add("active-port");
+
+          const allLandHexes = document.querySelectorAll(".hex:not(.ocean)");
+          allLandHexes.forEach(hex => {
+            let shouldHighlight = false;
+            if (portType === "generic") {
+              // Highlight Red Numbers (6 & 8)
+              const numSpan = hex.querySelector(".token-number");
+              if (numSpan && (numSpan.textContent === "6" || numSpan.textContent === "8")) {
+                shouldHighlight = true;
+              }
+            } else {
+              // Highlight Matching Resource
+              if (hex.classList.contains(portType)) {
+                shouldHighlight = true;
+              }
+            }
+
+            if (shouldHighlight) hex.classList.add("highlight-target");
+          });
+        });
+
+        portDiv.addEventListener("mouseleave", () => {
+          boardDiv.classList.remove("board-dimmed");
+          portDiv.classList.remove("active-port");
+          const highlighted = document.querySelectorAll(".highlight-target");
+          highlighted.forEach(el => el.classList.remove("highlight-target"));
+        });
+        // ---------------------------
+
         const iconDiv = document.createElement("div");
         iconDiv.classList.add("port-icon", portType);
         
@@ -295,7 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
       boardDiv.appendChild(div);
     }
 
-    // 3. Render Land
+    // C. Render Land Tiles
     finalTiles.forEach(tile => {
       const div = document.createElement("div");
       div.classList.add("hex", tile.terrain, `tile-${tile.id}`);
@@ -321,7 +347,7 @@ document.addEventListener("DOMContentLoaded", () => {
       boardDiv.appendChild(div);
     });
 
-    // 4. Render Intersections (The new feature)
+    // D. Render Intersections
     renderIntersections(finalTiles);
   });
 });
