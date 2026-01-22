@@ -370,8 +370,8 @@ h1 {
 
 /* 1. When the board is in 'highlight mode', dim EVERYTHING first */
 .board-dimmed .hex {
-  opacity: 0.3;
-  filter: grayscale(80%);
+  opacity: 0.2;
+  filter: grayscale(5%);
   transition: all 0.3s ease;
 }
 
@@ -382,7 +382,6 @@ h1 {
   transform: scale(1.1); /* Pop out slightly */
   z-index: 20;
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
-  border-radius: 50%; /* Soft glow */
 }
 
 /* 3. Keep the tokens bright on highlighted tiles */
