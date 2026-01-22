@@ -1,45 +1,133 @@
 body {
-  font-family: Arial, sans-serif;
+  font-family: sans-serif;
+  text-align: center;
+  background-color: #e0f7fa; /* Light blue sea background */
+  margin: 0;
+  padding: 20px;
+}
+
+h1 {
+  margin-bottom: 10px;
+}
+
+/* --- CONTROLS SECTION --- */
+.controls {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column; /* Stack button and toggle on small screens */
+  align-items: center;
+  gap: 15px;
+}
+
+#gen-btn {
+  font-size: 18px;
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #00796b;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+#gen-btn:hover {
+  background-color: #004d40;
+}
+
+/* Toggle Switch Styling */
+.toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  background: rgba(255,255,255,0.6);
+  padding: 8px 15px;
+  border-radius: 20px;
+  user-select: none;
+}
+
+.toggle-container input {
+  width: 16px;
+  height: 16px;
+  accent-color: #d50000;
+  cursor: pointer;
+}
+
+/* --- BOARD CONTAINER --- */
+#board-container {
+  display: flex;
+  justify-content: center;
+  overflow: auto; /* Allow scrolling if it gets too big on small phones */
   padding: 20px;
 }
 
 #board {
-  display: grid;
-  justify-content: center;
-  padding: 40px;
-  grid-template-columns: repeat(12, 38px);
-  grid-auto-rows: 71px;
-  gap: 6px;
-  margin-top: 20px;
+  position: relative;
+  width: 800px;  /* Fixed size canvas for the layout */
+  height: 800px;
+  /* Scale down for smaller screens */
+  transform-origin: top center;
 }
 
-.token {
-  background: white;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
+@media (max-width: 800px) {
+  #board {
+    transform: scale(0.6); /* Shrink for phones */
+  }
+}
+
+/* --- HEXAGON STYLING --- */
+.hex {
+  width: 100px;
+  height: 115px; /* approx 100 * 2/sqrt(3) */
+  position: absolute;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   display: flex;
-  flex-direction: column; /* Stacks items vertically */
   align-items: center;
   justify-content: center;
-  color: #333; /* Default text color (red overrides this via JS) */
+}
+
+/* Terrain Colors */
+.wood   { background-color: #2e7d32; } /* Forest Green */
+.brick  { background-color: #d84315; } /* Clay Red */
+.sheep  { background-color: #8bc34a; } /* Light Green */
+.wheat  { background-color: #fbc02d; } /* Yellow */
+.ore    { background-color: #78909c; } /* Stone Grey */
+.desert { background-color: #d7ccc8; } /* Sand */
+.ocean  { background-color: #0288d1; opacity: 0.3; } /* Water placeholders */
+
+/* --- TOKEN (NUMBER CHIT) --- */
+.token {
+  width: 35px;
+  height: 35px;
+  background-color: #fff8e1; /* Ivory */
+  border-radius: 50%;
+  border: 1px solid #333;
+  display: flex;
+  flex-direction: column; /* Stack Number on top of Pips */
+  align-items: center;
+  justify-content: center;
+  font-family: 'Times New Roman', serif;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  z-index: 10;
 }
 
 .token-number {
-  font-size: 13px; /* Slightly smaller to fit pips */
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: bold;
   line-height: 1;
-  margin-top: 2px; /* Push it down slightly from the very top edge */
 }
 
 .token-pips {
-  font-size: 16px; 
-  line-height: 10px; /* Tighten height so dots don't take up too much vertical space */
-  letter-spacing: -1px;
-  margin-top: 2px; /* Small gap between Number and Pips */
+  font-size: 14px; /* Dots size */
+  line-height: 0.6;
+  font-weight: bold;
+  letter-spacing: -1px; /* Bring dots closer */
 }
 
-/* Container for the port icon */
+/* --- PORTS (UPDATED FOR V-SHAPE) --- */
 .port {
   width: 100%;
   height: 100%;
@@ -50,36 +138,28 @@ body {
   pointer-events: none; 
 }
 
-/* THE TWO LEGS (V-Shape) */
-/* We create two lines instead of one, and rotate them 30 degrees apart */
+/* The V-Legs pointing to vertices */
 .port::before,
 .port::after {
   content: "";
   position: absolute;
   width: 4px;
-  height: 45px; /* Reach the corners */
+  height: 48px; /* Length to reach corners */
   background: #fff;
-  top: 50%;      /* Start from the center of the water hex */
+  top: 50%;
   left: 50%;
-  transform-origin: top center; /* Rotate from the center point */
-  z-index: 1;    /* Sit behind the port icon */
+  transform-origin: top center;
+  z-index: 1; 
   border-radius: 2px;
 }
 
-/* Leg 1: Points to left vertex */
-.port::before {
-  transform: translate(-50%, 0) rotate(-30deg);
-}
+/* Rotate legs +/- 30 degrees to hit vertices */
+.port::before { transform: translate(-50%, 0) rotate(-30deg); }
+.port::after  { transform: translate(-50%, 0) rotate(30deg); }
 
-/* Leg 2: Points to right vertex */
-.port::after {
-  transform: translate(-50%, 0) rotate(30deg);
-}
-
-/* The Port Icon (remains mostly the same, just ensure z-index is higher) */
 .port-icon {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: 2px solid #fff;
   background: white; 
@@ -87,19 +167,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: bold;
-  z-index: 5; /* Ensure it sits ON TOP of the legs */
+  z-index: 5;
   box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  position: relative; /* Needed for z-index to work */
+  position: relative; 
 }
 
-/* Ensure text counter-rotation still works */
-.port-text {
-  display: block;
-}
-
-/* Keep your resource colors... */
+/* Port Specific Colors */
 .port-icon.wood  { background: #4caf50; color: white; }
 .port-icon.sheep { background: #8bc34a; color: white; }
 .port-icon.wheat { background: #ffeb3b; color: #333; }
@@ -107,85 +182,49 @@ body {
 .port-icon.ore   { background: #9e9e9e; color: white; }
 .port-icon.generic { background: #eee; color: #333; }
 
-/* Hex shape */
-.hex {
-  width: 86px;
-  height: 100px;
-  clip-path: polygon(
-    50% 0%,   /* Top Point */
-    100% 25%, /* Top Right */
-    100% 75%, /* Bottom Right */
-    50% 100%, /* Bottom Point */
-    0% 75%,   /* Bottom Left */
-    0% 25%    /* Top Left */
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 20px;
-  color: #222;
-}
+/* Coordinates (Standard Spiral Layout) */
+/* Inner Ring */
+.tile-0 { top: 150px; left: 250px; }
+.tile-1 { top: 150px; left: 350px; }
+.tile-2 { top: 150px; left: 450px; }
+.tile-3 { top: 236px; left: 200px; }
+.tile-4 { top: 236px; left: 300px; }
+.tile-5 { top: 236px; left: 400px; }
+.tile-6 { top: 236px; left: 500px; }
+.tile-7 { top: 322px; left: 150px; }
+.tile-8 { top: 322px; left: 250px; }
+.tile-9 { top: 322px; left: 350px; }
+.tile-10{ top: 322px; left: 450px; }
+.tile-11{ top: 322px; left: 550px; }
+.tile-12{ top: 408px; left: 200px; }
+.tile-13{ top: 408px; left: 300px; }
+.tile-14{ top: 408px; left: 400px; }
+.tile-15{ top: 408px; left: 500px; }
+.tile-16{ top: 494px; left: 250px; }
+.tile-17{ top: 494px; left: 350px; }
+.tile-18{ top: 494px; left: 450px; }
 
-/* Terrain colors */
-.wood   { background: #4caf50; }
-.sheep  { background: #8bc34a; }
-.wheat  { background: #ffeb3b; }
-.brick  { background: #f44336; }
-.ore    { background: #9e9e9e; }
-.desert { background: #e0c68c; }
-.ocean { 
-  background: #2980b9; /* Nice deep sea blue */
-  color: transparent;  /* Hide text if your HTML puts numbers in them */
-  z-index: 1;          /* Ensures water stays behind if you add ports later */
-}
+/* Water Tiles (Surrounding the island) */
+/* Top Row */
+.water-0 { top: 64px; left: 200px; }
+.water-1 { top: 64px; left: 300px; }
+.water-2 { top: 64px; left: 400px; }
+.water-3 { top: 64px; left: 500px; }
 
-.tile-0  { grid-column: 5; grid-row: 2; }
-.tile-1  { grid-column: 7; grid-row: 2; }
-.tile-2  { grid-column: 9; grid-row: 2; }
+/* Sides */
+.water-4 { top: 150px; left: 150px; }
+.water-5 { top: 150px; left: 550px; }
+.water-6 { top: 236px; left: 100px; }
+.water-7 { top: 236px; left: 600px; }
+.water-8 { top: 322px; left: 50px;  }
+.water-9 { top: 322px; left: 650px; }
+.water-10{ top: 408px; left: 100px; }
+.water-11{ top: 408px; left: 600px; }
+.water-12{ top: 494px; left: 150px; }
+.water-13{ top: 494px; left: 550px; }
 
-.tile-3  { grid-column: 4; grid-row: 3; }
-.tile-4  { grid-column: 6; grid-row: 3; }
-.tile-5  { grid-column: 8; grid-row: 3; }
-.tile-6  { grid-column: 10; grid-row: 3; }
-
-.tile-7  { grid-column: 3; grid-row: 4; }
-.tile-8  { grid-column: 5; grid-row: 4; }
-.tile-9  { grid-column: 7; grid-row: 4; }
-.tile-10 { grid-column: 9; grid-row: 4; }
-.tile-11 { grid-column: 11; grid-row: 4; }
-
-.tile-12 { grid-column: 4; grid-row: 5; }
-.tile-13 { grid-column: 6; grid-row: 5; }
-.tile-14 { grid-column: 8; grid-row: 5; }
-.tile-15 { grid-column: 10; grid-row: 5; }
-
-.tile-16 { grid-column: 5; grid-row: 6; }
-.tile-17 { grid-column: 7; grid-row: 6; }
-.tile-18 { grid-column: 9; grid-row: 6; }
-
-/* --- TOP ROW (Row 1) --- */
-.water-0 { grid-column: 4; grid-row: 1; }
-.water-1 { grid-column: 6; grid-row: 1; }
-.water-2 { grid-column: 8; grid-row: 1; }
-.water-3 { grid-column: 10; grid-row: 1; }
-
-/* --- LEFT SIDE --- */
-.water-4 { grid-column: 3; grid-row: 2; } /* Left of top land row */
-.water-5 { grid-column: 2; grid-row: 3; } 
-.water-6 { grid-column: 1; grid-row: 4; } /* Middle-most left */
-.water-7 { grid-column: 2; grid-row: 5; } 
-.water-8 { grid-column: 3; grid-row: 6; } /* Left of bottom land row */
-
-/* --- RIGHT SIDE --- */
-.water-9  { grid-column: 11; grid-row: 2; } /* Right of top land row */
-.water-10 { grid-column: 12; grid-row: 3; } 
-.water-11 { grid-column: 13; grid-row: 4; } /* Middle-most right */
-.water-12 { grid-column: 12; grid-row: 5; } 
-.water-13 { grid-column: 11; grid-row: 6; } /* Right of bottom land row */
-
-/* --- BOTTOM ROW (Row 7) --- */
-.water-14 { grid-column: 4; grid-row: 7; }
-.water-15 { grid-column: 6; grid-row: 7; }
-.water-16 { grid-column: 8; grid-row: 7; }
-.water-17 { grid-column: 10; grid-row: 7; }
+/* Bottom Row */
+.water-14{ top: 580px; left: 200px; }
+.water-15{ top: 580px; left: 300px; }
+.water-16{ top: 580px; left: 400px; }
+.water-17{ top: 580px; left: 500px; }
