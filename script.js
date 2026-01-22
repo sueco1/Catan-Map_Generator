@@ -190,15 +190,12 @@ document.addEventListener("DOMContentLoaded", () => {
         iconDiv.classList.add("port-icon", portType);
         
         const textSpan = document.createElement("span");
-        // No text needed in CSS for icons, but good for accessibility/debug logic
         
-        // Add text symbol if needed, though color usually implies it
-        // If you want "3:1" or "2:1" text:
-        // textSpan.classList.add("port-text");
-        // textSpan.style.transform = `rotate(${-rotation}deg)`;
-        // textSpan.textContent = portType === "generic" ? "3:1" : "2:1";
-        // iconDiv.appendChild(textSpan);
+        textSpan.classList.add("port-text");
+        textSpan.style.transform = `rotate(${-rotation}deg)`;
+        textSpan.textContent = portType === "generic" ? "3:1" : "2:1";
         
+        iconDiv.appendChild(textSpan);
         portDiv.appendChild(iconDiv);
         div.appendChild(portDiv);
       }
