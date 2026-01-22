@@ -59,45 +59,47 @@ h1 {
 /* --- BOARD CONTAINER --- */
 #board-container {
   display: flex;
-  justify-content: center;
-  align-items: flex-start; /* Aligns board to top */
+  justify-content: center; /* Tries to center the board */
   width: 100%;
-  overflow: hidden; /* Stops user from scrolling left/right */
-  padding-top: 20px;
-  min-height: 50vh; /* Ensures container has height */
+  overflow: auto; /* IMPORTANT: Enables scrolling if it doesn't fit! */
+  padding-top: 10px;
+  padding-bottom: 50px; /* Extra space at bottom for scrolling */
 }
 
 #board {
   position: relative;
-  width: 800px;  /* The board is natively 800px wide */
+  /* The board is natively 800px wide based on your coordinate system */
+  width: 800px; 
   height: 800px;
-  transform-origin: top center; /* Shrink from the top-middle */
+  transform-origin: top center; 
   transition: transform 0.3s ease; 
+  /* Ensures the board doesn't align weirdly inside the flex container */
+  flex-shrink: 0; 
 }
 
-/* --- RESPONSIVE SCALING (THE FIX) --- */
+/* --- RESPONSIVE SCALING --- */
 
-/* Tablets & Small Laptops (Screen width less than 850px) */
+/* Tablets (iPad, etc.) */
 @media (max-width: 850px) {
   #board {
-    /* Scale down to 70% */
     transform: scale(0.7); 
-    margin-bottom: -250px; /* Pull the bottom up */
+    margin-bottom: -200px; 
   }
 }
 
-/* Phones (Screen width less than 600px) */
-/* We increased this number to catch larger phones */
+/* Phones (Mobile) */
 @media (max-width: 600px) {
   #board {
-    /* DYNAMIC SCALING:
-       Calculates scale based on screen width.
-       (Screen Width - 20px padding) divided by 800px Board Width 
-    */
-    transform: scale(calc((100vw - 20px) / 800));
+    /* Fixed scale: 0.42 * 800px = 336px. 
+       This fits inside almost all phones (which are usually ~375px wide) */
+    transform: scale(0.42); 
     
-    /* Pull the footer up so there isn't empty white space */
+    /* Pulls the empty space at the bottom up */
     margin-bottom: -450px; 
+    
+    /* Extra margin left ensures it doesn't get cut off on the left edge */
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 
