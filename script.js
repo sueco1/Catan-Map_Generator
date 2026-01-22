@@ -4,6 +4,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.getElementById("red-rule-toggle");
 
   // --- CONFIGURATION ---
+
+  // 1. Terrain Distribution (Standard Base Game)
   const terrains = [
     "desert",
     "ore", "ore", "ore",
@@ -13,11 +15,13 @@ document.addEventListener("DOMContentLoaded", () => {
     "wheat", "wheat", "wheat", "wheat"
   ];
 
+  // 2. Number Distribution (Skip 7)
   const numbers = [
     2, 3, 3, 4, 4, 5, 5, 6, 6,
     8, 8, 9, 9, 10, 10, 11, 11, 12
   ];
 
+  // 3. Pip Map (Dots count)
   const pipMap = {
     2: 1, 12: 1,
     3: 2, 11: 2,
@@ -26,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     6: 5, 8: 5
   };
 
+  // 4. Port Configuration
   const portPositions = {
     0: 330,  2: 30,
     6: 270,  10: 270,
@@ -38,15 +43,31 @@ document.addEventListener("DOMContentLoaded", () => {
     "generic", "generic", "generic", "generic"
   ];
 
+  // 5. Adjacency Map
   const adjacency = {
-    0: [1, 3, 4], 1: [0, 2, 4, 5], 2: [1, 5, 6],
-    3: [0, 4, 7, 8], 4: [0, 1, 3, 5, 8, 9], 5: [1, 2, 4, 6, 9, 10], 6: [2, 5, 10, 11],
-    7: [3, 8, 12], 8: [3, 4, 7, 9, 12, 13], 9: [4, 5, 8, 10, 13, 14], 10: [5, 6, 9, 11, 14, 15], 11: [6, 10, 15],
-    12: [7, 8, 13, 16], 13: [8, 9, 12, 14, 16, 17], 14: [9, 10, 13, 15, 17, 18], 15: [10, 11, 14, 18],
-    16: [12, 13, 17], 17: [13, 14, 16, 18], 18: [14, 15, 17]
+    0: [1, 3, 4],
+    1: [0, 2, 4, 5],
+    2: [1, 5, 6],
+    3: [0, 4, 7, 8],
+    4: [0, 1, 3, 5, 8, 9],
+    5: [1, 2, 4, 6, 9, 10],
+    6: [2, 5, 10, 11],
+    7: [3, 8, 12],
+    8: [3, 4, 7, 9, 12, 13],
+    9: [4, 5, 8, 10, 13, 14],
+    10: [5, 6, 9, 11, 14, 15],
+    11: [6, 10, 15],
+    12: [7, 8, 13, 16],
+    13: [8, 9, 12, 14, 16, 17],
+    14: [9, 10, 13, 15, 17, 18],
+    15: [10, 11, 14, 18],
+    16: [12, 13, 17],
+    17: [13, 14, 16, 18],
+    18: [14, 15, 17]
   };
 
   // --- HELPERS ---
+
   function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -60,14 +81,20 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let neighborId of neighbors) {
       const neighbor = currentTiles[neighborId];
       if (neighbor && neighbor.number !== null) {
-        if (neighbor.number === 6 || neighbor.number === 8) return true;
+        if (neighbor.number === 6 || neighbor.number === 8) {
+          return true;
+        }
       }
     }
     return false;
   }
 
+  // --- NEW STATS FUNCTION ---
   function updateStats(tiles) {
+    // 1. Reset counts
     const counts = { wood: 0, brick: 0, sheep: 0, wheat: 0, ore: 0 };
+    
+    // 2. Loop through tiles and sum pips
     tiles.forEach(tile => {
       if (tile.terrain !== "desert" && tile.number !== null) {
         const pips = pipMap[tile.number];
@@ -76,12 +103,18 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     });
-    const maxPips = 18; 
+
+    // 3. Update HTML
+    const maxPips = 18; // 18 is usually a high count (helps scaling)
+    
     for (const [resource, count] of Object.entries(counts)) {
       const valEl = document.getElementById(`val-${resource}`);
       const barEl = document.getElementById(`bar-${resource}`);
+      
       if (valEl && barEl) {
+        // Update Number
         valEl.textContent = count;
+        // Update Bar Width (capped at 100%)
         const percentage = Math.min((count / maxPips) * 100, 100); 
         barEl.style.width = `${percentage}%`;
       }
@@ -89,14 +122,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --- MAIN GENERATOR ---
+
   genBtn.addEventListener("click", () => {
     const useRedRule = toggleBtn ? toggleBtn.checked : true;
     let validMapFound = false;
     let attemptCount = 0;
     let finalTiles = [];
 
+    // Retry Loop
     while (!validMapFound && attemptCount < 1000) {
       attemptCount++;
+      
+      // Setup Tiles
       let currentTerrains = [...terrains];
       shuffle(currentTerrains);
       
@@ -105,12 +142,15 @@ document.addEventListener("DOMContentLoaded", () => {
         tempTiles.push({ id: i, terrain: currentTerrains[i], number: null });
       }
 
+      // Setup Numbers
       let currentNumbers = [...numbers];
       shuffle(currentNumbers);
 
+      // Assign Numbers
       let mapIsValid = true;
       for (let tile of tempTiles) {
         if (tile.terrain === "desert") continue;
+
         const num = currentNumbers.pop();
         tile.number = num;
 
@@ -129,19 +169,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (!validMapFound) {
-      alert("Could not find a valid map layout. Try again!");
+      alert("Could not find a valid map layout in 1000 attempts. Try again!");
       return;
     }
 
     // --- RENDERING ---
     boardDiv.innerHTML = "";
+    
+    // ** UPDATE STATS HERE **
     updateStats(finalTiles);
 
-    // 1. Ports
+    // 1. Shuffle Ports
     const currentPorts = [...portTypesSource];
     shuffle(currentPorts);
 
-    // 2. Render Water & Ports (Standard loop 0-17)
+    // 2. Render Water & Ports
     for (let i = 0; i < 18; i++) {
       const div = document.createElement("div");
       div.classList.add("hex", "ocean", `water-${i}`);
@@ -152,15 +194,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const portDiv = document.createElement("div");
         portDiv.classList.add("port");
         portDiv.style.transform = `rotate(${rotation}deg)`;
-        
         const iconDiv = document.createElement("div");
         iconDiv.classList.add("port-icon", portType);
-        
         const textSpan = document.createElement("span");
         textSpan.classList.add("port-text");
         textSpan.style.transform = `rotate(${-rotation}deg)`;
         textSpan.textContent = portType === "generic" ? "3:1" : "2:1";
-        
         iconDiv.appendChild(textSpan);
         portDiv.appendChild(iconDiv);
         div.appendChild(portDiv);
@@ -168,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
       boardDiv.appendChild(div);
     }
 
-    // 3. Render Land
+    // 3. Render Land & Tokens
     finalTiles.forEach(tile => {
       const div = document.createElement("div");
       div.classList.add("hex", tile.terrain, `tile-${tile.id}`);
@@ -176,7 +215,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (tile.number !== null) {
         const token = document.createElement("div");
         token.classList.add("token");
-        if (tile.number === 6 || tile.number === 8) token.style.color = "#d50000";
+
+        if (tile.number === 6 || tile.number === 8) {
+          token.style.color = "#d50000";
+        }
 
         const numSpan = document.createElement("span");
         numSpan.classList.add("token-number");

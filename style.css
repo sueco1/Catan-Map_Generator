@@ -1,185 +1,227 @@
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #e0f7fa; /* Light blue background */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
+  font-family: sans-serif;
+  text-align: center;
+  background-color: #e0f7fa; /* Light blue sea background */
   margin: 0;
   padding: 20px;
 }
 
 h1 {
-  color: #000;
   margin-bottom: 10px;
-  text-align: center;
-  font-weight: 700;
 }
 
-/* --- CONTROLS --- */
+/* --- CONTROLS SECTION --- */
 .controls {
-  margin: 10px 0 20px;
+  margin-bottom: 20px;
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* Stack button and toggle on small screens */
   align-items: center;
   gap: 15px;
 }
 
 #gen-btn {
-  padding: 12px 24px;
   font-size: 18px;
-  background-color: #004d40;
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #00796b;
   color: white;
   border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 #gen-btn:hover {
-  background-color: #00695c;
+  background-color: #004d40;
 }
 
-/* Single Toggle Styling */
-.toggle-wrapper {
-  background: white;
-  padding: 8px 20px;
-  border-radius: 30px;
+/* Toggle Switch Styling */
+.toggle-container {
   display: flex;
   align-items: center;
-  gap: 10px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-.toggle-label {
-  font-size: 16px;
-  color: #333;
-  font-weight: 500;
-}
-
-/* The Switch Box */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 26px;
-  height: 26px; /* Just a checkbox square for this style, or standard switch */
-}
-
-/* Custom Checkbox Look (Red Square Style from your image) */
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: #ccc;
-  transition: .4s;
-  border-radius: 4px; /* Slightly rounded square */
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 18px;
-  width: 18px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  transition: .4s;
-}
-
-input:checked + .slider {
-  background-color: #d32f2f; /* Red when checked */
-}
-
-.slider.round {
-  border-radius: 4px; 
-}
-
-
-/* --- GAME LAYOUT (Desktop) --- */
-.game-layout {
-  display: flex;
   justify-content: center;
-  align-items: flex-start;
-  gap: 50px;
-  width: 100%;
-  max-width: 1200px;
+  gap: 10px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  background: rgba(255,255,255,0.6);
+  padding: 8px 15px;
+  border-radius: 20px;
+  user-select: none;
 }
 
-/* --- STATS PANEL --- */
-#stats-panel {
-  background: rgba(255, 255, 255, 0.8);
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  width: 250px;
-  margin-top: 40px; 
+.toggle-container input {
+  width: 16px;
+  height: 16px;
+  accent-color: #d50000;
+  cursor: pointer;
 }
 
-#stats-panel h3 {
-  margin-top: 0;
-  text-align: center;
-  font-size: 16px;
-  margin-bottom: 15px;
-}
-
-.stat-row {
+/* --- HEXAGON STYLING --- */
+.hex {
+  width: 100px;
+  height: 115px; /* approx 100 * 2/sqrt(3) */
+  position: absolute;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  justify-content: center;
 }
 
-.stat-label {
-  width: 50px;
+/* Terrain Colors */
+.wood   { background-color: #2e7d32; } /* Forest Green */
+.brick  { background-color: #d84315; } /* Clay Red */
+.sheep  { background-color: #8bc34a; } /* Light Green */
+.wheat  { background-color: #fbc02d; } /* Yellow */
+.ore    { background-color: #78909c; } /* Stone Grey */
+.desert { background-color: #c2b280; } /* Sand */
+.ocean  { background-color: #0288d1; opacity: 0.5; } /* Water placeholders */
+
+/* --- TOKEN (NUMBER CHIT) --- */
+.token {
+  width: 35px;
+  height: 35px;
+  background-color: #fff8e1; /* Ivory */
+  border-radius: 50%;
+  border: 1px solid #333;
+  display: flex;
+  flex-direction: column; /* Stack Number on top of Pips */
+  align-items: center;
+  justify-content: center;
+  font-family: 'Times New Roman', serif;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  z-index: 10;
+}
+
+.token-number {
+  font-size: 16px;
   font-weight: bold;
-  font-size: 13px;
+  line-height: 1;
 }
 
-.stat-value {
-  width: 25px;
-  text-align: right;
+.token-pips {
+  font-size: 14px; /* Dots size */
+  line-height: 0.6;
   font-weight: bold;
-  font-size: 13px;
+  letter-spacing: -1px; /* Bring dots closer */
 }
 
-.bar-container {
-  flex-grow: 1;
-  background: #eee;
-  height: 8px;
-  border-radius: 4px;
-  margin: 0 10px;
-  overflow: hidden;
-}
-
-.bar {
+/* --- PORTS (UPDATED FOR V-SHAPE) --- */
+.port {
+  width: 100%;
   height: 100%;
-  width: 0%;
-  transition: width 0.5s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  pointer-events: none; 
 }
 
-/* Colors */
-.wood-bar { background-color: #228b22; }
-.brick-bar { background-color: #e34234; }
-.sheep-bar { background-color: #8bc34a; }
-.wheat-bar { background-color: #fdd835; }
-.ore-bar { background-color: #78909c; }
+/* The V-Legs pointing to vertices */
+.port::before,
+.port::after {
+  content: "";
+  position: absolute;
+  width: 4px;
+  height: 48px; /* Length to reach corners */
+  background: #fff;
+  top: 50%;
+  left: 50%;
+  transform-origin: top center;
+  z-index: 1; 
+  border-radius: 2px;
+}
 
+/* Rotate legs +/- 30 degrees to hit vertices */
+.port::before { transform: translate(-50%, 0) rotate(-30deg); }
+.port::after  { transform: translate(-50%, 0) rotate(30deg); }
+
+.port-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: white; 
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: bold;
+  z-index: 5;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  position: relative; 
+}
+
+/* Port Specific Colors */
+.port-icon.wood  { background: #4caf50; color: black; }
+.port-icon.sheep { background: #8bc34a; color: black; }
+.port-icon.wheat { background: #ffeb3b; color: black; }
+.port-icon.brick { background: #f44336; color: black; }
+.port-icon.ore   { background: #9e9e9e; color: black; }
+.port-icon.generic { background: #eee; color: black; }
+
+/* Coordinates (Standard Spiral Layout) */
+/* Inner Ring */
+.tile-0 { top: 150px; left: 250px; }
+.tile-1 { top: 150px; left: 350px; }
+.tile-2 { top: 150px; left: 450px; }
+.tile-3 { top: 236px; left: 200px; }
+.tile-4 { top: 236px; left: 300px; }
+.tile-5 { top: 236px; left: 400px; }
+.tile-6 { top: 236px; left: 500px; }
+.tile-7 { top: 322px; left: 150px; }
+.tile-8 { top: 322px; left: 250px; }
+.tile-9 { top: 322px; left: 350px; }
+.tile-10{ top: 322px; left: 450px; }
+.tile-11{ top: 322px; left: 550px; }
+.tile-12{ top: 408px; left: 200px; }
+.tile-13{ top: 408px; left: 300px; }
+.tile-14{ top: 408px; left: 400px; }
+.tile-15{ top: 408px; left: 500px; }
+.tile-16{ top: 494px; left: 250px; }
+.tile-17{ top: 494px; left: 350px; }
+.tile-18{ top: 494px; left: 450px; }
+
+/* Water Tiles (Surrounding the island) */
+/* Top Row */
+.water-0 { top: 64px; left: 200px; }
+.water-1 { top: 64px; left: 300px; }
+.water-2 { top: 64px; left: 400px; }
+.water-3 { top: 64px; left: 500px; }
+
+/* Sides */
+.water-4 { top: 150px; left: 150px; }
+.water-5 { top: 150px; left: 550px; }
+.water-6 { top: 236px; left: 100px; }
+.water-7 { top: 236px; left: 600px; }
+.water-8 { top: 322px; left: 50px;  }
+.water-9 { top: 322px; left: 650px; }
+.water-10{ top: 408px; left: 100px; }
+.water-11{ top: 408px; left: 600px; }
+.water-12{ top: 494px; left: 150px; }
+.water-13{ top: 494px; left: 550px; }
+
+/* Bottom Row */
+.water-14{ top: 580px; left: 200px; }
+.water-15{ top: 580px; left: 300px; }
+.water-16{ top: 580px; left: 400px; }
+.water-17{ top: 580px; left: 500px; }
 
 /* --- BOARD CONTAINER --- */
 #board-container {
   position: relative;
+  width: 100%;
+  /* Default Desktop Height */
   height: 850px; 
-  min-width: 800px;
-  display: block;
+  overflow: hidden; 
+  padding-top: 20px;
+  /* Centers the content in the container */
+  display: block; 
 }
 
 #board {
-  position: relative;
+  /* Default Desktop State */
+  position: relative; 
   width: 800px;
   height: 800px;
   transform-origin: top center;
@@ -187,145 +229,123 @@ input:checked + .slider {
   margin: 0 auto; 
 }
 
-/* Hexagons */
-.hex {
-  position: absolute;
-  width: 150px;
-  height: 173.2px;
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* Tokens */
-.token {
-  width: 50px;
-  height: 50px;
-  background-color: #f8f5e6;
-  border-radius: 50%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-  z-index: 10;
-  color: #000;
-}
-
-.token-number { font-size: 18px; font-weight: bold; line-height: 1; }
-.token-pips { font-size: 14px; line-height: 0.5; margin-top: 3px; font-weight: bold; }
-
-/* Colors */
-.wood { background-color: #7cb342; } /* Lighter green */
-.brick { background-color: #d84315; } /* Burnt orange */
-.sheep { background-color: #aed581; } /* Light green */
-.wheat { background-color: #fdd835; } /* Yellow */
-.ore { background-color: #546e7a; }   /* Blue-grey */
-.desert { background-color: #d7ccc8; }
-.ocean { background-color: #4fc3f7; }
-
-/* Ports */
-.port {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-.port-icon {
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 36px;
-  height: 36px;
-  background-color: #fff;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 10px;
-  font-weight: bold;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  z-index: 5;
-}
-.port-text { display: block; }
-.port-icon.wood { background-color: #7cb342; color: white; }
-.port-icon.brick { background-color: #d84315; color: white; }
-.port-icon.sheep { background-color: #aed581; color: white; }
-.port-icon.wheat { background-color: #fdd835; color: #333; }
-.port-icon.ore { background-color: #546e7a; color: white; }
-.port-icon.generic { background-color: #e0e0e0; color: #333; }
-
-
-/* --- COORDINATES --- */
-/* Row 1 */
-.water-0 { top: 0; left: 175px; }
-.water-1 { top: 0; left: 325px; }
-.water-2 { top: 0; left: 475px; }
-/* Row 2 */
-.water-3 { top: 129px; left: 100px; }
-.tile-0  { top: 129px; left: 250px; }
-.tile-1  { top: 129px; left: 400px; }
-.water-4 { top: 129px; left: 550px; }
-/* Row 3 */
-.water-5 { top: 258px; left: 25px; }
-.tile-2  { top: 258px; left: 175px; }
-.tile-3  { top: 258px; left: 325px; }
-.tile-4  { top: 258px; left: 475px; }
-.water-6 { top: 258px; left: 625px; }
-/* Row 4 */
-.water-7 { top: 387px; left: 25px; }
-.tile-5  { top: 387px; left: 175px; }
-.tile-6  { top: 387px; left: 325px; }
-.tile-7  { top: 387px; left: 475px; }
-.water-8 { top: 387px; left: 625px; }
-/* Row 5 */
-.water-9 { top: 516px; left: 25px; }
-.tile-8  { top: 516px; left: 175px; }
-.tile-9  { top: 516px; left: 325px; }
-.tile-10 { top: 516px; left: 475px; }
-.water-10{ top: 516px; left: 625px; }
-/* Row 6 */
-.water-11{ top: 645px; left: 100px; }
-.tile-11 { top: 645px; left: 250px; }
-.tile-12 { top: 645px; left: 400px; }
-.water-12{ top: 645px; left: 550px; }
-/* Row 7 */
-.water-13{ top: 774px; left: 175px; }
-.water-14{ top: 774px; left: 325px; }
-.water-15{ top: 774px; left: 475px; }
-
-/* --- RESPONSIVE --- */
+/* --- RESPONSIVE SCALING --- */
 
 /* Tablets */
 @media (max-width: 850px) {
-  .game-layout {
-    flex-direction: column; 
-    align-items: center;
+  #board {
+    transform: scale(0.7); 
   }
-  #board { transform: scale(0.7); }
-  #board-container { height: 600px; min-width: 100%; }
-  #stats-panel { width: 80%; max-width: 500px; margin-top: 0; margin-bottom: 40px; }
+  #board-container {
+    height: 600px; 
+  }
 }
 
-/* Phones */
+/* Phones - THE FIX */
 @media (max-width: 600px) {
   #board-container {
+    /* STRICT HEIGHT: Matches the scaled board size (800 * 0.42 = ~336) */
     height: 360px; 
-    padding: 0; margin: 0;
-    overflow: hidden; 
-    width: 100%; min-width: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden; /* Cuts off everything else */
   }
+
   #board {
+    /* ABSOLUTE: Removes the 'ghost' 800px height from the page flow */
     position: absolute; 
-    top: 10px; left: 50%; 
+    top: 10px; /* Small gap from top */
+    
+    /* Center horizontally */
+    left: 50%; 
     margin-left: -400px; 
+    
+    /* Scale */
     transform-origin: top center;
     transform: scale(0.42); 
   }
+}
+
+/* --- GAME LAYOUT (Desktop) --- */
+.game-layout {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 40px; /* Space between board and graph */
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* --- STATS PANEL --- */
+#stats-panel {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  width: 280px;
+  margin-top: 40px; /* Aligns visually with the board top */
+}
+
+#stats-panel h3 {
+  margin-top: 0;
+  text-align: center;
+  color: #333;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.stat-label {
+  width: 50px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.stat-value {
+  width: 30px;
+  text-align: right;
+  font-weight: bold;
+}
+
+.bar-container {
+  flex-grow: 1;
+  background: #eee;
+  height: 12px;
+  border-radius: 6px;
+  margin: 0 10px;
+  overflow: hidden;
+}
+
+.bar {
+  height: 100%;
+  width: 0%; /* JS will change this */
+  transition: width 0.5s ease;
+  border-radius: 6px;
+}
+
+/* Bar Colors */
+.wood-bar { background-color: #228b22; }
+.brick-bar { background-color: #e34234; }
+.sheep-bar { background-color: #8bc34a; }
+.wheat-bar { background-color: #fdd835; }
+.ore-bar { background-color: #78909c; }
+
+
+/* --- MOBILE ADJUSTMENTS --- */
+@media (max-width: 850px) {
+  .game-layout {
+    flex-direction: column; /* Stack them */
+    align-items: center;
+    gap: 0;
+  }
+
   #stats-panel {
-    width: 90%; max-width: 350px;
-    margin-top: 20px; margin-bottom: 50px;
+    width: 90%; /* Wide on mobile */
+    max-width: 400px;
+    margin-top: 10px;
+    margin-bottom: 40px;
   }
 }
