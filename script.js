@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const genBtn = document.getElementById("gen-btn");
   const redRuleToggle = document.getElementById("red-rule-toggle");
   const fixedPortsToggle = document.getElementById("fixed-ports-toggle");
-  const noClumpToggle = document.getElementById("no-clump-toggle"); // <--- NEW TOGGLE
+  const noClumpToggle = document.getElementById("no-clump-toggle");
 
   // --- CONFIGURATION ---
 
@@ -71,21 +71,42 @@ document.addEventListener("DOMContentLoaded", () => {
     return false;
   }
 
-  // Check 2: Clumping Rule (No Wood touching Wood, etc.)
+  // Check 2: Clumping Rule (Allows groups of 2, but rejects 3+)
   function checkClumping(tiles) {
-    for (let tile of tiles) {
-      if (tile.terrain === "desert") continue; // Desert is safe
-      
-      const neighbors = adjacency[tile.id];
-      for (let neighborId of neighbors) {
-        const neighbor = tiles[neighborId];
-        // If neighbor is same terrain, we have a clump
-        if (neighbor.terrain === tile.terrain) {
-          return true; // Failed check
+    const visited = new Set();
+
+    for (let i = 0; i < 19; i++) {
+      // Skip if already checked or if it's the desert
+      if (visited.has(i)) continue;
+      if (tiles[i].terrain === "desert") continue;
+
+      // Start a "Flood Fill" to find the size of this resource group
+      let groupSize = 0;
+      let queue = [i];
+      visited.add(i);
+      let resourceType = tiles[i].terrain;
+
+      while (queue.length > 0) {
+        let currentId = queue.pop(); // Remove from queue
+        groupSize++;
+
+        // Check all neighbors
+        let neighbors = adjacency[currentId];
+        for (let nId of neighbors) {
+          // If neighbor is same type and not visited yet, add to group
+          if (!visited.has(nId) && tiles[nId].terrain === resourceType) {
+            visited.add(nId);
+            queue.push(nId);
+          }
         }
       }
+
+      // Logic: If we found a group bigger than 2, the map is bad.
+      if (groupSize > 2) {
+        return true; // Clump detected!
+      }
     }
-    return false; // No clumps found
+    return false; // All groups are size 1 or 2
   }
 
   function updateStats(tiles) {
@@ -122,7 +143,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let attemptCount = 0;
     let finalTiles = [];
 
-    // Retry Loop (Increased limit because clumping + red rule is harder to solve)
+    // Retry Loop
+    // Increased to 5000 because strict rules make valid maps rarer
     while (!validMapFound && attemptCount < 5000) {
       attemptCount++;
       
@@ -136,11 +158,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // 2. CHECK: Terrain Clumping
-      // If user wants no clumping, we check immediately after placing terrains.
-      // If it fails, we 'continue' to restart the loop immediately.
       if (useNoClumping) {
         if (checkClumping(tempTiles)) {
-          continue; // Try again
+          continue; // Failed clumping check, restart loop
         }
       }
 
