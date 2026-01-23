@@ -22,8 +22,8 @@ h1 {
   /* 2. THE RECTANGLE STYLING */
   background-color: rgba(255, 255, 255, 0.5); /* Light, semi-transparent box */
   padding: 20px 40px;        /* Breathing room inside the box */
-  border-radius: 25px;       /* <--- CHANGE THIS for more/less roundness */
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Subtle shadow for pop */
+  border-radius: 25px;       /* Roundness */
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Subtle shadow */
   
   /* Center the box itself on the page */
   width: fit-content;
@@ -136,7 +136,6 @@ body.dark-mode .controls {
 }
 
 /* --- PORTS (V-SHAPE) --- */
-/* FIXED SECTION BELOW */
 .port {
   width: 100%;
   height: 100%;
@@ -144,10 +143,7 @@ body.dark-mode .controls {
   align-items: center;
   justify-content: center;
   position: absolute;
-  
-  /* CHANGED: pointer-events must be auto to detect mouse */
   pointer-events: auto; 
-  /* ADDED: High z-index to sit on top of water */
   z-index: 100;
   cursor: pointer;
 }
@@ -253,25 +249,11 @@ body.dark-mode .controls {
   margin: 0 auto; 
 }
 
-/* --- RESPONSIVE SCALING --- */
+/* --- RESPONSIVE SCALING (Board Size) --- */
+/* Scale board down only if screen is narrower than 850px */
 @media (max-width: 850px) {
   #board { transform: scale(0.7); }
   #board-container { height: 600px; }
-}
-
-@media (max-width: 600px) {
-  #board-container {
-    height: 360px; 
-    padding: 0; margin: 0;
-    overflow: hidden; 
-  }
-  #board {
-    position: absolute; 
-    top: 10px; left: 50%; 
-    margin-left: -400px; 
-    transform-origin: top center;
-    transform: scale(0.42); 
-  }
 }
 
 /* --- GAME LAYOUT --- */
@@ -331,9 +313,9 @@ body.dark-mode .controls {
 .wheat-bar { background-color: #fdd835; }
 .ore-bar { background-color: #78909c; }
 
-
-/* --- MOBILE ADJUSTMENTS --- */
-@media (max-width: 850px) {
+/* --- MOBILE ADJUSTMENTS (Layout Stacking) --- */
+/* Trigger stacking sooner (at 1200px) to fix tablet cut-off */
+@media (max-width: 1200px) {
   .game-layout {
     flex-direction: column; 
     align-items: center;
@@ -347,24 +329,37 @@ body.dark-mode .controls {
   }
 }
 
+/* Tiny Screens (Phones) */
+@media (max-width: 600px) {
+  #board-container {
+    height: 360px; 
+    padding: 0; margin: 0;
+    overflow: hidden; 
+  }
+  #board {
+    position: absolute; 
+    top: 10px; left: 50%; 
+    margin-left: -400px; 
+    transform-origin: top center;
+    transform: scale(0.42); 
+  }
+}
+
 /* --- INTERSECTION MARKERS (Pip Score) --- */
 .intersection {
   position: absolute;
   width: 20px;
   height: 20px;
-  background-color: rgba(255, 255, 255, 0.4); /* Faint white dot */
+  background-color: rgba(255, 255, 255, 0.4); 
   border: 1px solid rgba(0,0,0,0.2);
   border-radius: 50%;
-  transform: translate(-50%, -50%); /* Center strictly on the point */
-  z-index: 50; /* Above tokens */
-/*cursor: help;*/
+  transform: translate(-50%, -50%); 
+  z-index: 50; 
   transition: all 0.2s ease;
-  
-  /* Flex to center the number */
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0; /* Hide text normally */
+  font-size: 0; 
 }
 
 .intersection:hover {
@@ -379,40 +374,34 @@ body.dark-mode .controls {
   z-index: 60;
 }
 
-/* Optional: Color code high value spots on hover */
 .intersection:hover[data-pips="10"],
 .intersection:hover[data-pips="11"], 
 .intersection:hover[data-pips="12"],
 .intersection:hover[data-pips="13"] {
-  background-color: #ffeb3b; /* Gold for high value */
+  background-color: #ffeb3b; 
 }
 
 /* --- HARBORMASTER HIGHLIGHTS --- */
-
-/* 1. When the board is in 'highlight mode', dim EVERYTHING first */
 .board-dimmed .hex {
   opacity: 0.2;
   filter: grayscale(5%);
   transition: all 0.3s ease;
 }
 
-/* 2. ...Except the specific tiles we want to see */
 .board-dimmed .hex.highlight-target {
   opacity: 1;
   filter: grayscale(0%);
-  transform: scale(1.1); /* Pop out slightly */
+  transform: scale(1.1); 
   z-index: 20;
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
 }
 
-/* 3. Keep the tokens bright on highlighted tiles */
 .board-dimmed .hex.highlight-target .token {
   background-color: #fff;
   border-color: #000;
   transform: scale(1.1);
 }
 
-/* 4. Keep the port being hovered fully visible */
 .board-dimmed .port.active-port {
   opacity: 1;
   z-index: 30;
@@ -429,19 +418,18 @@ body.dark-mode .controls {
   background: rgba(255, 255, 255, 0.2);
   padding: 5px 10px;
   border-radius: 20px;
-  z-index: 1000; /* Ensure it sits above everything */
+  z-index: 1000; 
 }
 
 .theme-toggle .icon {
   font-size: 24px;
   cursor: pointer;
-  opacity: 0.3; /* Dimmed by default */
+  opacity: 0.3; 
   filter: grayscale(100%);
   transition: all 0.3s ease;
   user-select: none;
 }
 
-/* The Active State (Highlighted) */
 .theme-toggle .icon.active {
   opacity: 1;
   filter: grayscale(0%);
@@ -450,78 +438,44 @@ body.dark-mode .controls {
 }
 
 /* --- DARK MODE THEME --- */
-/* This class is added to the Body via JS */
 body.dark-mode {
-  background-color: #2c3e50 !important; /* The dark blue-grey */
-  color: #ecf0f1; /* Changes text to light grey so you can read it */
+  background-color: #2c3e50 !important; 
+  color: #ecf0f1; 
 }
 
-/* Optional: Make the controls look better in dark mode */
 body.dark-mode .controls {
-  background-color: #34495e; /* Slightly lighter blue-grey for the box */
+  background-color: #34495e; 
   color: #fff;
 }
 body.dark-mode .toggle-container {
-  color: #333; /* Keep toggle text readable */
+  color: #333; 
 }
 
 /* --- DARK MODE FIXES --- */
+.ocean { z-index: 1; }
+.wood, .brick, .sheep, .wheat, .ore, .desert { z-index: 5; }
+.token { z-index: 10; }
+.port { z-index: 100; }
 
-/* 1. Fix Layering (The "Dim" Issue) 
-   We explicitly tell the browser: Water goes on bottom, Land goes on top. */
-.ocean {
-  z-index: 1; /* Lowest level */
-}
+#stats-panel { color: #333 !important; }
 
-.wood, .brick, .sheep, .wheat, .ore, .desert {
-  z-index: 5; /* Land sits ABOVE water */
-}
-
-.token {
-  z-index: 10; /* Tokens sit ABOVE land */
-}
-
-.port {
-  z-index: 100; /* Ports sit ABOVE everything so you can hover them */
-}
-
-/* 2. Fix Stats Panel Text 
-   In dark mode, the body text is white. 
-   We need to force the text inside the white stats panel back to black. */
-#stats-panel {
-  color: #333 !important;
-}
-
-/* 3. Fix Water Visibility in Dark Mode
-   The standard 0.5 opacity looks muddy on a dark background.
-   We make it brighter so it looks like water, not oil. */
 body.dark-mode .ocean {
-  opacity: 0.8;      /* Make it less transparent */
-  filter: brightness(1.2); /* Make the blue pop more */
+  opacity: 0.8;      
+  filter: brightness(1.2); 
 }
 
-/* 4. Fix Token Text Color
-   Ensure token numbers stay black, even if the body is in dark mode */
-.token {
-  color: #333 !important;
-}
+.token { color: #333 !important; }
 
 /* --- MOBILE ADJUSTMENTS FOR THEME TOGGLE --- */
 @media (max-width: 600px) {
   .theme-toggle {
-    /* Move it closer to the corner */
     top: 10px;
     right: 10px;
-    
-    /* Shrink the box padding */
     padding: 4px 8px;
-    
-    /* Bring icons closer together */
     gap: 6px;
   }
 
   .theme-toggle .icon {
-    /* Make the emojis smaller (Desktop is 24px) */
     font-size: 18px; 
   }
 }
