@@ -505,3 +505,23 @@ body.dark-mode .ocean {
 .token {
   color: #333 !important;
 }
+
+/* --- MOBILE ADJUSTMENTS FOR THEME TOGGLE --- */
+@media (max-width: 600px) {
+  .theme-toggle {
+    /* Move it closer to the corner */
+    top: 10px;
+    right: 10px;
+    
+    /* Shrink the box padding */
+    padding: 4px 8px;
+    
+    /* Bring icons closer together */
+    gap: 6px;
+  }
+
+  .theme-toggle .icon {
+    /* Make the emojis smaller (Desktop is 24px) */
+    font-size: 18px; 
+  }
+}
