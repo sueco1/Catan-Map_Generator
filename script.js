@@ -5,6 +5,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const fixedPortsToggle = document.getElementById("fixed-ports-toggle");
   const noClumpToggle = document.getElementById("no-clump-toggle");
 
+// --- THEME TOGGLER ---
+  const sunIcon = document.getElementById("sun-icon");
+  const moonIcon = document.getElementById("moon-icon");
+  const bodyEl = document.body;
+
+  function setMode(mode) {
+    if (mode === 'dark') {
+      bodyEl.classList.add("dark-mode");
+      moonIcon.classList.add("active");
+      sunIcon.classList.remove("active");
+    } else {
+      bodyEl.classList.remove("dark-mode");
+      sunIcon.classList.add("active");
+      moonIcon.classList.remove("active");
+    }
+  }
+
+  sunIcon.addEventListener("click", () => setMode('light'));
+  moonIcon.addEventListener("click", () => setMode('dark'));
+
   // --- CONFIGURATION ---
 
   const terrains = [
