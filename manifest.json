@@ -1,0 +1,15 @@
+{
+  "name": "Catan Map Generator",
+  "short_name": "Catan Gen",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#e0f7fa",
+  "theme_color": "#2c3e50",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
