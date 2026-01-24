@@ -352,9 +352,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 2. Land Tiles
-    finalTiles.forEach(tile => {
+    finalTiles.forEach((tile, index) => { // <--- Added 'index' here
       const div = document.createElement("div");
       div.classList.add("hex", tile.terrain, `tile-${tile.id}`);
+
+      // --- NEW ANIMATION CODE ---
+      div.classList.add("animate-deal");
+      // Delay each tile by 0.05 seconds x its index (0.05, 0.10, 0.15...)
+      div.style.animationDelay = `${index * 0.05}s`; 
+      // --------------------------
 
       if (tile.number !== null) {
         const token = document.createElement("div");
