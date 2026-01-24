@@ -481,28 +481,37 @@ function rollTurnOrder() {
     return;
   }
 
-  // Create array of { color, roll }
+  // 1. Roll the dice
   let results = selectedPlayers.map(p => {
     return { color: p, roll: Math.floor(Math.random() * 6) + 1 + Math.floor(Math.random() * 6) + 1 };
   });
 
-  // Sort by roll (descending)
+  // 2. Sort by roll (highest to lowest)
   results.sort((a, b) => b.roll - a.roll);
 
-  // Render
+  // 3. Define the labels
+  const rankNames = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth"];
+
+  // 4. Render the list
   results.forEach((item, index) => {
     const li = document.createElement("li");
     li.classList.add("order-item");
     
     const spanName = document.createElement("span");
-    spanName.textContent = `${index + 1}. ${item.color}`;
-    spanName.classList.add(`p-${item.color}`); // Adds color class
+    // e.g. "Red"
+    spanName.textContent = item.color;
+    spanName.classList.add(`p-${item.color}`); 
     
-    const spanRoll = document.createElement("span");
-    spanRoll.textContent = `Roll: ${item.roll}`;
+    const spanRank = document.createElement("span");
+    // e.g. "First" (based on the current index)
+    spanRank.textContent = rankNames[index];
     
+    // Optional: Add a subtle style to the rank text
+    spanRank.style.color = "#888"; 
+    spanRank.style.fontSize = "0.9em";
+
     li.appendChild(spanName);
-    li.appendChild(spanRoll);
+    li.appendChild(spanRank);
     list.appendChild(li);
   });
 }
