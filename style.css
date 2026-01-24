@@ -423,37 +423,50 @@ body.dark-mode .stat-value {color: #333333;}
    9. LAYOUT & RESPONSIVENESS
    ========================================================================== */
 
-/* Wrapper for Board + Stats */
+/* DEFAULT: Vertical Stack (Mobile, Tablet, Small Laptop) 
+   This ensures the board is ALWAYS centered and nothing is cut off. */
 .game-container {
   display: flex;
-  flex-direction: row;       /* Default: Side-by-side */
-  justify-content: center;   /* Center the whole group */
-  align-items: flex-start;   /* Align them at the top */
-  gap: 15px;                 /* Reduced gap (was 40px) */
-  margin-top: 10px;          /* Reduced top space */
+  flex-direction: column;
+  align-items: center; /* Centers the board horizontally */
+  gap: 20px;
   width: 100%;
+  margin-top: 10px;
 }
 
-/* Ensure the board itself is always centered inside its box */
 #board-container {
+  /* Keeps the hex grid clean */
   display: flex;
-  justify-content: center;   /* Forces the hex grid to center */
+  justify-content: center;
   align-items: center;
-  flex-shrink: 0;            /* Prevents board from getting squished */
 }
 
-/* TABLET/PORTRAIT MODE OVERRIDE */
-@media (max-width: 1100px) {
+#stats-panel {
+  width: 90%;
+  max-width: 400px;
+  margin-top: 10px;
+}
+
+/* LARGE SCREENS ONLY (> 1300px) 
+   Switch to Side-by-Side ONLY if there is enough room to 
+   keep the board in the true center without cropping the panel. */
+@media (min-width: 1300px) {
   .game-container {
-    flex-direction: column;  /* Stack vertically */
-    align-items: center;     /* Center everything */
-    gap: 10px;               /* Even smaller gap on mobile */
+    display: grid;
+    grid-template-columns: 1fr auto 1fr; /* Left Space | Board | Right Space */
+    align-items: start;
+    gap: 0;
+  }
+
+  #board-container {
+    grid-column: 2; /* Forces board into the exact center of the screen */
   }
 
   #stats-panel {
-    width: 90%;              /* slightly wider on mobile */
-    max-width: 400px;
-    margin-top: 5px;         /* Very close to the board now */
-    margin-left: 0;
+    grid-column: 3; /* Puts panel in the right-hand empty space */
+    width: 350px;
+    margin-top: 40px; /* Aligns visually with the board top */
+    margin-left: 20px;
+    justify-self: start;
   }
 }
