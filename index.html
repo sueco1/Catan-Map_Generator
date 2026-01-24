@@ -69,8 +69,26 @@
         <div class="bar-container"><div class="bar ore-bar" id="bar-ore"></div></div>
         <span class="stat-value" id="val-ore">0</span>
       </div>
-    </div>
 
+      <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ddd;">
+
+      <h3>Turn Order</h3>
+      <p style="font-size: 13px; color: #666; margin-bottom: 10px;">Pick colors to join, then roll:</p>
+
+      <div class="player-selector">
+        <div class="p-token p-opt-Red" onclick="togglePlayer(this, 'Red')"></div>
+        <div class="p-token p-opt-Blue" onclick="togglePlayer(this, 'Blue')"></div>
+        <div class="p-token p-opt-Orange" onclick="togglePlayer(this, 'Orange')"></div>
+        <div class="p-token p-opt-White" onclick="togglePlayer(this, 'White')"></div>
+      </div>
+
+      <button id="roll-order-btn" onclick="rollTurnOrder()">Roll Turn Order</button>
+
+      <ul id="turn-order-list">
+        <li style="color: #999; list-style: none; font-style: italic;">Select colors above...</li>
+      </ul>
+
+    </div>
   </div>
 
   <script src="script.js"></script>

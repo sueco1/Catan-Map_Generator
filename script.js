@@ -349,7 +349,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (tile.number !== null) {
         const token = document.createElement("div");
         token.classList.add("token");
-        if (tile.number === 6 || tile.number === 8) token.style.color = "#d50000";
+
+        if (tile.number === 6 || tile.number === 8) {
+          token.classList.add("red");
+        } else if (tile.number === 5 || tile.number === 9) {
+          token.classList.add("orange");
+        }
 
         const numSpan = document.createElement("span");
         numSpan.classList.add("token-number");
@@ -370,4 +375,65 @@ document.addEventListener("DOMContentLoaded", () => {
     // D. Render Intersections
     renderIntersections(finalTiles);
   });
+
+  // --- PLAYER RANDOMIZER LOGIC ---
+
+  // 1. Toggle the visual state of the player tokens
+  window.togglePlayer = function(element, color) {
+    element.classList.toggle("selected");
+    // Optionally: Clear the list if they change selection so they know to re-roll
+    const list = document.getElementById("turn-order-list");
+    if(list.children.length > 0 && !list.children[0].textContent.includes("Select")) {
+       list.innerHTML = '<li style="color: #999; list-style: none;">Selection changed. Roll again!</li>';
+    }
+  };
+
+  // 2. Generate the order based on currently selected tokens
+  window.rollTurnOrder = function() {
+    const list = document.getElementById("turn-order-list");
+    list.innerHTML = ""; // Clear list
+
+    // Find all tokens that have the class 'selected'
+    const selectedTokens = document.querySelectorAll(".p-token.selected");
+    
+    // Extract the color names from the class lists or data
+    let activePlayers = [];
+    selectedTokens.forEach(token => {
+      // We look for the class that starts with 'p-opt-' to get the name, 
+      // or we can just pass the name via the onclick, but since we are iterating DOM elements:
+      if (token.classList.contains("p-opt-Red")) activePlayers.push("Red");
+      if (token.classList.contains("p-opt-Blue")) activePlayers.push("Blue");
+      if (token.classList.contains("p-opt-Orange")) activePlayers.push("Orange");
+      if (token.classList.contains("p-opt-White")) activePlayers.push("White");
+    });
+
+    if (activePlayers.length < 2) {
+      list.innerHTML = '<li style="color: #d50000; list-style: none;">Select at least 2 players.</li>';
+      return;
+    }
+
+    // Shuffle
+    shuffle(activePlayers);
+
+    // Render
+    activePlayers.forEach((color, index) => {
+      const li = document.createElement("li");
+      li.classList.add("order-item");
+      
+      const numSpan = document.createElement("span");
+      numSpan.textContent = `${index + 1}.`;
+      numSpan.style.marginRight = "10px";
+      numSpan.style.color = "#666";
+
+      const nameSpan = document.createElement("span");
+      nameSpan.textContent = color;
+      // Re-use the class we made earlier for text color
+      nameSpan.classList.add(`p-${color}`); 
+
+      li.appendChild(numSpan);
+      li.appendChild(nameSpan);
+      list.appendChild(li);
+    });
+  };
+
 });

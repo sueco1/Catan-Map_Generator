@@ -12,34 +12,30 @@ h1 {
 
 /* --- CONTROLS SECTION --- */
 .controls {
-  /* 1. LAYOUT: Stack Button (top) and Toggles (bottom) */
   display: flex;
   flex-direction: column; 
   align-items: center;
-  gap: 15px; /* Space between the Button and the Toggles */
+  gap: 15px; 
   margin-bottom: 30px;
   
-  /* 2. THE RECTANGLE STYLING */
-  background-color: rgba(255, 255, 255, 0.5); /* Light, semi-transparent box */
-  padding: 20px 40px;        /* Breathing room inside the box */
-  border-radius: 25px;       /* Roundness */
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Subtle shadow */
+  background-color: rgba(255, 255, 255, 0.5); 
+  padding: 20px 40px;        
+  border-radius: 25px;       
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
   
-  /* Center the box itself on the page */
   width: fit-content;
   margin-left: auto;
   margin-right: auto;
 }
 
-/* Dark Mode Adjustment for the rectangle */
 body.dark-mode .controls {
-  background-color: #34495e; /* Dark Blue-Grey */
+  background-color: #34495e; 
   color: #fff;
 }
 
 #gen-btn {
   font-size: 18px;
-  padding: 10px 30px; /* Wider button looks better in this layout */
+  padding: 10px 30px; 
   cursor: pointer;
   background-color: #00796b;
   color: white;
@@ -54,16 +50,14 @@ body.dark-mode .controls {
 }
 
 /* --- TOGGLES WRAPPER --- */
-/* This aligns the toggles side-by-side underneath the button */
 .toggles-wrapper {
   display: flex;
   flex-direction: row; 
   gap: 15px;
-  flex-wrap: wrap; /* Wraps to next line on tiny screens */
+  flex-wrap: wrap; 
   justify-content: center;
 }
 
-/* Toggle Switch Styling */
 .toggle-container {
   display: flex;
   align-items: center;
@@ -120,6 +114,17 @@ body.dark-mode .controls {
   font-family: 'Times New Roman', serif;
   box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
   z-index: 10;
+  /* Ensure default text is black even in dark mode initially */
+  color: #333 !important; 
+}
+
+/* COLOR CLASSES */
+.token.red {
+  color: #d50000 !important; /* Red for 6 & 8 */
+}
+
+.token.orange {
+  color: #e65100 !important; /* Orange for 5 & 9 */
 }
 
 .token-number {
@@ -249,8 +254,7 @@ body.dark-mode .controls {
   margin: 0 auto; 
 }
 
-/* --- RESPONSIVE SCALING (Board Size) --- */
-/* Scale board down only if screen is narrower than 850px */
+/* --- RESPONSIVE SCALING --- */
 @media (max-width: 850px) {
   #board { transform: scale(0.7); }
   #board-container { height: 600px; }
@@ -313,8 +317,7 @@ body.dark-mode .controls {
 .wheat-bar { background-color: #fdd835; }
 .ore-bar { background-color: #78909c; }
 
-/* --- MOBILE ADJUSTMENTS (Layout Stacking) --- */
-/* Trigger stacking sooner (at 1200px) to fix tablet cut-off */
+/* --- MOBILE ADJUSTMENTS --- */
 @media (max-width: 1200px) {
   .game-layout {
     flex-direction: column; 
@@ -329,7 +332,6 @@ body.dark-mode .controls {
   }
 }
 
-/* Tiny Screens (Phones) */
 @media (max-width: 600px) {
   #board-container {
     height: 360px; 
@@ -345,7 +347,7 @@ body.dark-mode .controls {
   }
 }
 
-/* --- INTERSECTION MARKERS (Pip Score) --- */
+/* --- INTERSECTION MARKERS --- */
 .intersection {
   position: absolute;
   width: 20px;
@@ -479,3 +481,106 @@ body.dark-mode .ocean {
     font-size: 18px; 
   }
 }
+
+/* --- PLAYER SELECTOR & ORDER --- */
+.player-selector {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+/* The clickable tokens */
+.p-token {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid rgba(0,0,0,0.1);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+  opacity: 0.3; /* Dimmed by default */
+  transform: scale(0.9);
+}
+
+/* Specific Colors */
+.p-opt-Red    { background-color: #d50000; }
+.p-opt-Blue   { background-color: #1565c0; }
+.p-opt-Orange { background-color: #e65100; }
+.p-opt-White  { background-color: #ffffff; border: 2px solid #ccc; }
+
+/* STATE: Selected (Active) */
+.p-token.selected {
+  opacity: 1;
+  transform: scale(1.2);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  border-color: #333; 
+}
+
+/* Checkmark indicator for selected items */
+/*.p-token.selected::after {
+  content: "✓";
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 16px;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+.p-token.p-opt-White.selected::after { color: #333; text-shadow: none; }*/
+
+/* --- ROLL BUTTON --- */
+#roll-order-btn {
+  background-color: #607d8b;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: background 0.2s;
+}
+
+#roll-order-btn:hover {
+  background-color: #455a64;
+}
+
+#roll-order-btn:active {
+  transform: translateY(1px);
+}
+
+/* --- ORDER LIST --- */
+#turn-order-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  text-align: left;
+  padding-left: 20px; 
+}
+
+.order-item {
+  background: #f9f9f9;
+  border-bottom: 1px solid #eee;
+  padding: 8px 10px;
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+}
+
+/* Color indicators for the text */
+.p-Red { color: #d50000; }
+.p-Blue { color: #1565c0; }
+.p-White { color: #9e9e9e; text-shadow: 0 0 1px #333; }
+.p-Orange { color: #e65100; }
+
+/* Dark mode tweaks for the list */
+body.dark-mode .order-item {
+  background: #2c3e50;
+  border-bottom: 1px solid #455a64;
+  color: #ecf0f1;
+}
+body.dark-mode .p-White { color: #fff; text-shadow: none; }
