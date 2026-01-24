@@ -273,8 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
     boardDiv.innerHTML = "";
     updateStats(finalTiles);
 
-    // This variable ensures the ripple animation flows from water -> land seamlessly
-    let delayIndex = 0;
+    let delayIndex = 0; // Animation Counter
 
     // 1. Ports & Water
     let currentPorts = [];
@@ -289,11 +288,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const div = document.createElement("div");
       div.classList.add("hex", "ocean", `water-${i}`);
 
-      // --- ANIMATION STEP 1: Water ---
+      // Animation Step 1: Water
       div.classList.add("animate-deal");
       div.style.animationDelay = `${delayIndex * 0.05}s`;
       delayIndex++;
-      // -------------------------------
 
       if (portPositions.hasOwnProperty(i)) {
         const portType = currentPorts.pop();
@@ -303,7 +301,7 @@ document.addEventListener("DOMContentLoaded", () => {
         portDiv.classList.add("port");
         portDiv.style.transform = `rotate(${rotation}deg)`;
         
-        // Harbormaster
+        // Harbormaster Highlighting
         portDiv.addEventListener("mouseenter", () => {
           boardDiv.classList.add("board-dimmed");
           portDiv.classList.add("active-port");
@@ -348,11 +346,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const div = document.createElement("div");
       div.classList.add("hex", tile.terrain, `tile-${tile.id}`);
 
-      // --- ANIMATION STEP 2: Land (continues from delayIndex) ---
+      // Animation Step 2: Land
       div.classList.add("animate-deal");
       div.style.animationDelay = `${delayIndex * 0.05}s`; 
       delayIndex++;
-      // ----------------------------------------------------------
 
       if (tile.number !== null) {
         const token = document.createElement("div");
@@ -380,20 +377,47 @@ document.addEventListener("DOMContentLoaded", () => {
     renderIntersections(finalTiles);
   });
 
-  // --- PLAYER RANDOMIZER ---
+  // --- PLAYER RANDOMIZER (RESTORED SELECTOR LOGIC) ---
   
-  window.generateTurnOrder = function(count) {
+  // 1. Toggle the visual state of the player tokens
+  window.togglePlayer = function(element, color) {
+    element.classList.toggle("selected");
+    // Clear the list if selection changes so users know to re-roll
     const list = document.getElementById("turn-order-list");
-    if (!list) return;
+    if(list && list.children.length > 0 && !list.children[0].textContent.includes("Select")) {
+       list.innerHTML = '<li style="color: #999; list-style: none;">Selection changed. Roll again!</li>';
+    }
+  };
+
+  // 2. Generate the order based on currently selected tokens
+  window.rollTurnOrder = function() {
+    const list = document.getElementById("turn-order-list");
+    if(!list) return;
     
     list.innerHTML = ""; 
 
-    const colors = ["Red", "Blue", "Orange", "White", "Green", "Brown"];
-    shuffle(colors);
+    // Find all tokens that have the class 'selected'
+    // This assumes your HTML elements have classes like 'p-opt-Red', 'p-opt-Blue' etc.
+    const selectedTokens = document.querySelectorAll(".p-token.selected");
+    
+    let activePlayers = [];
+    selectedTokens.forEach(token => {
+      if (token.classList.contains("p-opt-Red")) activePlayers.push("Red");
+      if (token.classList.contains("p-opt-Blue")) activePlayers.push("Blue");
+      if (token.classList.contains("p-opt-Orange")) activePlayers.push("Orange");
+      if (token.classList.contains("p-opt-White")) activePlayers.push("White");
+      if (token.classList.contains("p-opt-Green")) activePlayers.push("Green");
+      if (token.classList.contains("p-opt-Brown")) activePlayers.push("Brown");
+    });
 
-    const selectedPlayers = colors.slice(0, count);
+    if (activePlayers.length < 2) {
+      list.innerHTML = '<li style="color: #d50000; list-style: none;">Select at least 2 players.</li>';
+      return;
+    }
 
-    selectedPlayers.forEach((color, index) => {
+    shuffle(activePlayers);
+
+    activePlayers.forEach((color, index) => {
       const li = document.createElement("li");
       li.classList.add("order-item");
       
@@ -404,7 +428,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const nameSpan = document.createElement("span");
       nameSpan.textContent = color;
-      nameSpan.classList.add(`p-${color}`);
+      nameSpan.classList.add(`p-${color}`); 
 
       li.appendChild(numSpan);
       li.appendChild(nameSpan);

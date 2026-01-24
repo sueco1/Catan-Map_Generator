@@ -251,7 +251,7 @@ body.dark-mode .controls {
   height: 800px;
   transform-origin: top center;
   transition: transform 0.3s ease;
-  margin: 0 auto; 
+  margin-top: -70px;
 }
 
 /* --- RESPONSIVE SCALING --- */
@@ -582,7 +582,7 @@ body.dark-mode .ocean {
 @keyframes popIn {
   0% {transform: scale(0); opacity: 0;}
   60% {transform: scale(1.1); opacity: 1;}
-  100% {transform: scale(1); opacity: 1; }
+  100% {transform: scale(1); opacity: 1;}
 }
 
 .animate-deal {
