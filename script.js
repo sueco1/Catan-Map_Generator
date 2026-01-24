@@ -1,11 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
   const boardDiv = document.getElementById("board");
   const genBtn = document.getElementById("gen-btn");
-  const redRuleToggle = document.getElementById("red-rule-toggle");
-  const fixedPortsToggle = document.getElementById("fixed-ports-toggle");
-  const noClumpToggle = document.getElementById("no-clump-toggle");
+  
+  // Toggles
+  const toggle68 = document.getElementById("prevent-6-8");
+  const toggle212 = document.getElementById("prevent-2-12");
+  const toggleFixedPorts = document.getElementById("fixed-ports-toggle");
+  const toggleNoClump = document.getElementById("no-clump-toggle");
 
-// --- THEME TOGGLER ---
+  // --- THEME TOGGLER ---
   const sunIcon = document.getElementById("sun-icon");
   const moonIcon = document.getElementById("moon-icon");
   const bodyEl = document.body;
@@ -25,9 +28,9 @@ document.addEventListener("DOMContentLoaded", () => {
   sunIcon.addEventListener("click", () => setMode('light'));
   moonIcon.addEventListener("click", () => setMode('dark'));
 
-  // --- CONFIGURATION ---
+  // --- DATA ---
 
-  const terrains = [
+  const terrainsSource = [
     "desert",
     "ore", "ore", "ore",
     "brick", "brick", "brick",
@@ -36,7 +39,8 @@ document.addEventListener("DOMContentLoaded", () => {
     "wheat", "wheat", "wheat", "wheat"
   ];
 
-  const numbers = [
+  // Note: 18 numbers (Desert gets skipped)
+  const numbersSource = [
     2, 3, 3, 4, 4, 5, 5, 6, 6,
     8, 8, 9, 9, 10, 10, 11, 11, 12
   ];
@@ -49,28 +53,12 @@ document.addEventListener("DOMContentLoaded", () => {
     6: 5, 8: 5
   };
 
-  // Coordinates matched to CSS .tile-X (top, left)
-  // Used for Intersection Calculation
   const tileCoordinates = [
-    { id: 0,  top: 150, left: 250 },
-    { id: 1,  top: 150, left: 350 },
-    { id: 2,  top: 150, left: 450 },
-    { id: 3,  top: 236, left: 200 },
-    { id: 4,  top: 236, left: 300 },
-    { id: 5,  top: 236, left: 400 },
-    { id: 6,  top: 236, left: 500 },
-    { id: 7,  top: 322, left: 150 },
-    { id: 8,  top: 322, left: 250 },
-    { id: 9,  top: 322, left: 350 },
-    { id: 10, top: 322, left: 450 },
-    { id: 11, top: 322, left: 550 },
-    { id: 12, top: 408, left: 200 },
-    { id: 13, top: 408, left: 300 },
-    { id: 14, top: 408, left: 400 },
-    { id: 15, top: 408, left: 500 },
-    { id: 16, top: 494, left: 250 },
-    { id: 17, top: 494, left: 350 },
-    { id: 18, top: 494, left: 450 }
+    { id: 0,  top: 150, left: 250 }, { id: 1,  top: 150, left: 350 }, { id: 2,  top: 150, left: 450 },
+    { id: 3,  top: 236, left: 200 }, { id: 4,  top: 236, left: 300 }, { id: 5,  top: 236, left: 400 }, { id: 6,  top: 236, left: 500 },
+    { id: 7,  top: 322, left: 150 }, { id: 8,  top: 322, left: 250 }, { id: 9,  top: 322, left: 350 }, { id: 10, top: 322, left: 450 }, { id: 11, top: 322, left: 550 },
+    { id: 12, top: 408, left: 200 }, { id: 13, top: 408, left: 300 }, { id: 14, top: 408, left: 400 }, { id: 15, top: 408, left: 500 },
+    { id: 16, top: 494, left: 250 }, { id: 17, top: 494, left: 350 }, { id: 18, top: 494, left: 450 }
   ];
 
   const portPositions = {
@@ -85,13 +73,27 @@ document.addEventListener("DOMContentLoaded", () => {
     "generic", "generic", "generic", "generic"
   ];
 
-  const adjacency = {
-    0: [1, 3, 4], 1: [0, 2, 4, 5], 2: [1, 5, 6],
-    3: [0, 4, 7, 8], 4: [0, 1, 3, 5, 8, 9], 5: [1, 2, 4, 6, 9, 10], 6: [2, 5, 10, 11],
-    7: [3, 8, 12], 8: [3, 4, 7, 9, 12, 13], 9: [4, 5, 8, 10, 13, 14], 10: [5, 6, 9, 11, 14, 15], 11: [6, 10, 15],
-    12: [7, 8, 13, 16], 13: [8, 9, 12, 14, 16, 17], 14: [9, 10, 13, 15, 17, 18], 15: [10, 11, 14, 18],
-    16: [12, 13, 17], 17: [13, 14, 16, 18], 18: [14, 15, 17]
-  };
+  const adjacency = [
+    [1, 3, 4],          // 0
+    [0, 2, 4, 5],       // 1
+    [1, 5, 6],          // 2
+    [0, 4, 7, 8],       // 3
+    [0, 1, 3, 5, 8, 9], // 4
+    [1, 2, 4, 6, 9, 10],// 5
+    [2, 5, 10, 11],     // 6
+    [3, 8, 12],         // 7
+    [3, 4, 7, 9, 12, 13], // 8
+    [4, 5, 8, 10, 13, 14], // 9
+    [5, 6, 9, 11, 14, 15], // 10
+    [6, 10, 15],        // 11
+    [7, 8, 13, 16],     // 12
+    [8, 9, 12, 14, 16, 17], // 13
+    [9, 10, 13, 15, 17, 18], // 14
+    [10, 11, 14, 18],   // 15
+    [12, 13, 17],       // 16
+    [13, 14, 16, 18],   // 17
+    [14, 15, 17]        // 18
+  ];
 
   // --- HELPERS ---
 
@@ -102,20 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Rule: No 6s or 8s touching
-  function hasBadNeighbor(tileIndex, currentNumber, currentTiles) {
-    if (currentNumber !== 6 && currentNumber !== 8) return false;
-    const neighbors = adjacency[tileIndex];
-    for (let neighborId of neighbors) {
-      const neighbor = currentTiles[neighborId];
-      if (neighbor && neighbor.number !== null) {
-        if (neighbor.number === 6 || neighbor.number === 8) return true;
-      }
-    }
-    return false;
-  }
-
-  // Rule: Flood Fill check to prevent groups of 3+ same resources
+  // Helper: Check if map has resource clumps (3+ of same type connected)
   function checkClumping(tiles) {
     const visited = new Set();
     for (let i = 0; i < 19; i++) {
@@ -138,13 +127,12 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         }
       }
-      // Allow pairs (2), but fail on 3+
-      if (groupSize > 2) return true;
+      if (groupSize > 2) return true; // Fail if clump > 2
     }
     return false;
   }
 
-  // Update the stats bars below the board
+  // Helper: Update Stats Panel
   function updateStats(tiles) {
     const counts = { wood: 0, brick: 0, sheep: 0, wheat: 0, ore: 0 };
     tiles.forEach(tile => {
@@ -167,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Feature: Render Intersection Pip Scores
+  // Helper: Render Intersection Pips
   function renderIntersections(tiles) {
     const offsets = [
       { x: 50, y: 0 }, { x: 100, y: 29 }, { x: 100, y: 86 }, 
@@ -182,9 +170,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const coords = tileCoordinates[tile.id];
 
       offsets.forEach(offset => {
-        const absX = Math.round(coords.left + offset.x);
-        const absY = Math.round(coords.top + offset.y);
-        // Snap to grid to handle slight rounding differences
+        const absX = coords.left + offset.x;
+        const absY = coords.top + offset.y;
+        // Snap to grid (nearest 5)
         const snapX = Math.round(absX / 5) * 5;
         const snapY = Math.round(absY / 5) * 5;
         const key = `${snapX},${snapY}`;
@@ -210,77 +198,104 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // --- VALIDATION LOGIC ---
+  
+  function isValidMap(tiles, check68, check212) {
+    for (let i = 0; i < 19; i++) {
+      const current = tiles[i];
+      if (current.number === null) continue; // Skip desert
+
+      const neighbors = adjacency[i];
+      for (let nId of neighbors) {
+        const neighbor = tiles[nId];
+        if (neighbor.number === null) continue;
+
+        // Rule 1: No 6s or 8s touching
+        if (check68) {
+           if ( (current.number === 6 || current.number === 8) && 
+                (neighbor.number === 6 || neighbor.number === 8) ) {
+             return false;
+           }
+        }
+
+        // Rule 2: No 2s or 12s touching
+        if (check212) {
+           if ( (current.number === 2 || current.number === 12) && 
+                (neighbor.number === 2 || neighbor.number === 12) ) {
+             return false;
+           }
+        }
+      }
+    }
+    return true;
+  }
+
   // --- MAIN GENERATOR ---
 
   genBtn.addEventListener("click", () => {
-    // 1. Read Toggles
-    const useRedRule = redRuleToggle ? redRuleToggle.checked : true;
-    const useFixedPorts = fixedPortsToggle ? fixedPortsToggle.checked : false;
-    const useNoClumping = noClumpToggle ? noClumpToggle.checked : false;
+    // 1. Get Toggle States
+    const use68Rule = toggle68 ? toggle68.checked : true;
+    const use212Rule = toggle212 ? toggle212.checked : true;
+    const useNoClump = toggleNoClump ? toggleNoClump.checked : false;
+    const useFixedPorts = toggleFixedPorts ? toggleFixedPorts.checked : false;
 
-    let validMapFound = false;
-    let attemptCount = 0;
+    let success = false;
+    let attempts = 0;
     let finalTiles = [];
 
-    // 2. Generation Loop (Retry until rules are met)
-    while (!validMapFound && attemptCount < 5000) {
-      attemptCount++;
-      let currentTerrains = [...terrains];
+    // 2. Loop until valid map found or timeout
+    while (!success && attempts < 2000) {
+      attempts++;
+      
+      // A. Generate Terrains
+      let currentTerrains = [...terrainsSource];
       shuffle(currentTerrains);
       
+      // Create Tile Objects
       let tempTiles = [];
-      for(let i=0; i<19; i++){
+      for(let i=0; i<19; i++) {
         tempTiles.push({ id: i, terrain: currentTerrains[i], number: null });
       }
 
-      // Check Clumping
-      if (useNoClumping && checkClumping(tempTiles)) continue;
+      // Check Clumping (if enabled) - Retry terrain shuffle if bad
+      if (useNoClump && checkClumping(tempTiles)) continue;
 
-      let currentNumbers = [...numbers];
+      // B. Assign Numbers
+      let currentNumbers = [...numbersSource];
       shuffle(currentNumbers);
-
-      let mapIsValid = true;
-      for (let tile of tempTiles) {
-        if (tile.terrain === "desert") continue;
-        const num = currentNumbers.pop();
-        tile.number = num;
-
-        // Check Red Rule
-        if (useRedRule) {
-          if (hasBadNeighbor(tile.id, num, tempTiles)) {
-            mapIsValid = false;
-            break; 
-          }
+      
+      // Fill non-desert tiles
+      for(let t of tempTiles) {
+        if(t.terrain !== "desert") {
+          t.number = currentNumbers.pop();
         }
       }
 
-      if (mapIsValid) {
-        validMapFound = true;
+      // C. Validate Number Placement
+      if (isValidMap(tempTiles, use68Rule, use212Rule)) {
+        success = true;
         finalTiles = tempTiles;
       }
     }
 
-    if (!validMapFound) {
-      alert("Could not find a valid map. Try again!");
+    if (!success) {
+      alert("Could not generate a valid map with these strict settings. Please try again.");
       return;
     }
 
-    // --- RENDERING ---
+    // --- RENDER BOARD ---
     boardDiv.innerHTML = "";
     updateStats(finalTiles);
 
-    // A. Setup Port Array
+    // 1. Ports
     let currentPorts = [];
     if (useFixedPorts) {
-      currentPorts = [
-        "wood", "generic", "brick", "wheat", "generic", "ore", "generic", "sheep", "generic"
-      ];
+      currentPorts = ["wood", "generic", "brick", "wheat", "generic", "ore", "generic", "sheep", "generic"];
     } else {
       currentPorts = [...portTypesSource];
       shuffle(currentPorts);
     }
 
-    // B. Render Water & Ports (with Harbormaster Logic)
     for (let i = 0; i < 18; i++) {
       const div = document.createElement("div");
       div.classList.add("hex", "ocean", `water-${i}`);
@@ -293,45 +308,40 @@ document.addEventListener("DOMContentLoaded", () => {
         portDiv.classList.add("port");
         portDiv.style.transform = `rotate(${rotation}deg)`;
         
-        // --- HARBORMASTER EVENTS ---
+        // Harbormaster Highlighting
         portDiv.addEventListener("mouseenter", () => {
           boardDiv.classList.add("board-dimmed");
           portDiv.classList.add("active-port");
-
           const allLandHexes = document.querySelectorAll(".hex:not(.ocean)");
+          
           allLandHexes.forEach(hex => {
-            let shouldHighlight = false;
+            let match = false;
+            // Get number from token inside hex
+            const numSpan = hex.querySelector(".token-number");
+            
             if (portType === "generic") {
-              // Highlight Red Numbers (6 & 8)
-              const numSpan = hex.querySelector(".token-number");
-              if (numSpan && (numSpan.textContent === "6" || numSpan.textContent === "8")) {
-                shouldHighlight = true;
-              }
+               // Highlight 6 and 8
+               if (numSpan && (numSpan.textContent === "6" || numSpan.textContent === "8")) match = true;
             } else {
-              // Highlight Matching Resource
-              if (hex.classList.contains(portType)) {
-                shouldHighlight = true;
-              }
+               // Highlight Matching Resource
+               if (hex.classList.contains(portType)) match = true;
             }
-
-            if (shouldHighlight) hex.classList.add("highlight-target");
+            if (match) hex.classList.add("highlight-target");
           });
         });
 
         portDiv.addEventListener("mouseleave", () => {
           boardDiv.classList.remove("board-dimmed");
           portDiv.classList.remove("active-port");
-          const highlighted = document.querySelectorAll(".highlight-target");
-          highlighted.forEach(el => el.classList.remove("highlight-target"));
+          document.querySelectorAll(".highlight-target").forEach(el => el.classList.remove("highlight-target"));
         });
-        // ---------------------------
 
         const iconDiv = document.createElement("div");
         iconDiv.classList.add("port-icon", portType);
         
         const textSpan = document.createElement("span");
         textSpan.classList.add("port-text");
-        textSpan.style.transform = `rotate(${-rotation}deg)`; 
+        textSpan.style.transform = `rotate(${-rotation}deg)`;
         textSpan.textContent = portType === "generic" ? "3:1" : "2:1";
         
         iconDiv.appendChild(textSpan);
@@ -341,7 +351,7 @@ document.addEventListener("DOMContentLoaded", () => {
       boardDiv.appendChild(div);
     }
 
-    // C. Render Land Tiles
+    // 2. Land Tiles
     finalTiles.forEach(tile => {
       const div = document.createElement("div");
       div.classList.add("hex", tile.terrain, `tile-${tile.id}`);
@@ -349,12 +359,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (tile.number !== null) {
         const token = document.createElement("div");
         token.classList.add("token");
-
-        if (tile.number === 6 || tile.number === 8) {
-          token.classList.add("red");
-        } else if (tile.number === 5 || tile.number === 9) {
-          token.classList.add("orange");
-        }
+        
+        if (tile.number === 6 || tile.number === 8) token.classList.add("red");
+        if (tile.number === 5 || tile.number === 9) token.classList.add("orange");
 
         const numSpan = document.createElement("span");
         numSpan.classList.add("token-number");
@@ -362,8 +369,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const pipsSpan = document.createElement("span");
         pipsSpan.classList.add("token-pips");
-        const count = pipMap[tile.number] || 0;
-        pipsSpan.textContent = "•".repeat(count);
+        pipsSpan.textContent = "•".repeat(pipMap[tile.number]);
 
         token.appendChild(numSpan);
         token.appendChild(pipsSpan);
@@ -372,51 +378,27 @@ document.addEventListener("DOMContentLoaded", () => {
       boardDiv.appendChild(div);
     });
 
-    // D. Render Intersections
+    // 3. Intersections
     renderIntersections(finalTiles);
   });
 
-  // --- PLAYER RANDOMIZER LOGIC ---
-
-  // 1. Toggle the visual state of the player tokens
-  window.togglePlayer = function(element, color) {
-    element.classList.toggle("selected");
-    // Optionally: Clear the list if they change selection so they know to re-roll
+  // --- PLAYER RANDOMIZER (SIMPLE BUTTON VERSION) ---
+  
+  window.generateTurnOrder = function(count) {
     const list = document.getElementById("turn-order-list");
-    if(list.children.length > 0 && !list.children[0].textContent.includes("Select")) {
-       list.innerHTML = '<li style="color: #999; list-style: none;">Selection changed. Roll again!</li>';
-    }
-  };
-
-  // 2. Generate the order based on currently selected tokens
-  window.rollTurnOrder = function() {
-    const list = document.getElementById("turn-order-list");
+    if (!list) return;
+    
     list.innerHTML = ""; // Clear list
 
-    // Find all tokens that have the class 'selected'
-    const selectedTokens = document.querySelectorAll(".p-token.selected");
-    
-    // Extract the color names from the class lists or data
-    let activePlayers = [];
-    selectedTokens.forEach(token => {
-      // We look for the class that starts with 'p-opt-' to get the name, 
-      // or we can just pass the name via the onclick, but since we are iterating DOM elements:
-      if (token.classList.contains("p-opt-Red")) activePlayers.push("Red");
-      if (token.classList.contains("p-opt-Blue")) activePlayers.push("Blue");
-      if (token.classList.contains("p-opt-Orange")) activePlayers.push("Orange");
-      if (token.classList.contains("p-opt-White")) activePlayers.push("White");
-    });
+    // Pool of available colors
+    const colors = ["Red", "Blue", "Orange", "White", "Green", "Brown"];
+    shuffle(colors);
 
-    if (activePlayers.length < 2) {
-      list.innerHTML = '<li style="color: #d50000; list-style: none;">Select at least 2 players.</li>';
-      return;
-    }
+    // Slice array for number of players
+    const selectedPlayers = colors.slice(0, count);
 
-    // Shuffle
-    shuffle(activePlayers);
-
-    // Render
-    activePlayers.forEach((color, index) => {
+    // Render list
+    selectedPlayers.forEach((color, index) => {
       const li = document.createElement("li");
       li.classList.add("order-item");
       
@@ -427,8 +409,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const nameSpan = document.createElement("span");
       nameSpan.textContent = color;
-      // Re-use the class we made earlier for text color
-      nameSpan.classList.add(`p-${color}`); 
+      nameSpan.classList.add(`p-${color}`);
 
       li.appendChild(numSpan);
       li.appendChild(nameSpan);

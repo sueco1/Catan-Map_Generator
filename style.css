@@ -498,7 +498,7 @@ body.dark-mode .ocean {
   cursor: pointer;
   border: 2px solid rgba(0,0,0,0.1);
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-  opacity: 0.3; /* Dimmed by default */
+  opacity: 0.5;
   transform: scale(0.9);
 }
 
@@ -576,11 +576,3 @@ body.dark-mode .ocean {
 .p-Blue { color: #1565c0; }
 .p-White { color: #9e9e9e; text-shadow: 0 0 1px #333; }
 .p-Orange { color: #e65100; }
-
-/* Dark mode tweaks for the list */
-body.dark-mode .order-item {
-  background: #2c3e50;
-  border-bottom: 1px solid #455a64;
-  color: #ecf0f1;
-}
-body.dark-mode .p-White { color: #fff; text-shadow: none; }
