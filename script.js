@@ -35,13 +35,15 @@ const portTypesSource = [
 ];
 
 const portPositions = {
-  0: 330,  1: 210, 
-  3: 30,           
-  6: 150,          
-  11: 90,          
-  15: 330, 16: 270,
-  17: 210, 
-  12: 30
+  0: 330,
+  2: 30, 
+  5: 30,           
+  6: 270,          
+  9: 90,          
+  10: 270,
+  13: 150,
+  14: 210, 
+  16: 150
 };
 
 /* ==========================================================================
@@ -259,7 +261,7 @@ genBtn.addEventListener("click", () => {
   // 1. Ports & Water
   let currentPorts = [];
   if (useFixedPorts) {
-    currentPorts = ["wood", "generic", "brick", "wheat", "generic", "ore", "generic", "sheep", "generic"];
+    currentPorts = ["ore", "generic", "wheat", "sheep", "generic", "generic", "wood", "brick", "generic"];
   } else {
     currentPorts = [...portTypesSource];
     shuffle(currentPorts);
