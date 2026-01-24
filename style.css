@@ -256,7 +256,8 @@ body.dark-mode .controls {
 
 /* --- RESPONSIVE SCALING --- */
 @media (max-width: 850px) {
-  #board { transform: scale(0.7); }
+  #board { transform: scale(0.7); 
+  margin: 0; }
   #board-container { height: 600px; }
 }
 
