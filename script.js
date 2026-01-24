@@ -39,7 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
     "wheat", "wheat", "wheat", "wheat"
   ];
 
-  // Note: 18 numbers (Desert gets skipped)
   const numbersSource = [
     2, 3, 3, 4, 4, 5, 5, 6, 6,
     8, 8, 9, 9, 10, 10, 11, 11, 12
@@ -104,7 +103,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Helper: Check if map has resource clumps (3+ of same type connected)
   function checkClumping(tiles) {
     const visited = new Set();
     for (let i = 0; i < 19; i++) {
@@ -127,12 +125,11 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         }
       }
-      if (groupSize > 2) return true; // Fail if clump > 2
+      if (groupSize > 2) return true; 
     }
     return false;
   }
 
-  // Helper: Update Stats Panel
   function updateStats(tiles) {
     const counts = { wood: 0, brick: 0, sheep: 0, wheat: 0, ore: 0 };
     tiles.forEach(tile => {
@@ -155,7 +152,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Helper: Render Intersection Pips
   function renderIntersections(tiles) {
     const offsets = [
       { x: 50, y: 0 }, { x: 100, y: 29 }, { x: 100, y: 86 }, 
@@ -172,7 +168,6 @@ document.addEventListener("DOMContentLoaded", () => {
       offsets.forEach(offset => {
         const absX = coords.left + offset.x;
         const absY = coords.top + offset.y;
-        // Snap to grid (nearest 5)
         const snapX = Math.round(absX / 5) * 5;
         const snapY = Math.round(absY / 5) * 5;
         const key = `${snapX},${snapY}`;
@@ -203,22 +198,19 @@ document.addEventListener("DOMContentLoaded", () => {
   function isValidMap(tiles, check68, check212) {
     for (let i = 0; i < 19; i++) {
       const current = tiles[i];
-      if (current.number === null) continue; // Skip desert
+      if (current.number === null) continue;
 
       const neighbors = adjacency[i];
       for (let nId of neighbors) {
         const neighbor = tiles[nId];
         if (neighbor.number === null) continue;
 
-        // Rule 1: No 6s or 8s touching
         if (check68) {
            if ( (current.number === 6 || current.number === 8) && 
                 (neighbor.number === 6 || neighbor.number === 8) ) {
              return false;
            }
         }
-
-        // Rule 2: No 2s or 12s touching
         if (check212) {
            if ( (current.number === 2 || current.number === 12) && 
                 (neighbor.number === 2 || neighbor.number === 12) ) {
@@ -243,35 +235,29 @@ document.addEventListener("DOMContentLoaded", () => {
     let attempts = 0;
     let finalTiles = [];
 
-    // 2. Loop until valid map found or timeout
+    // 2. Loop until valid map found
     while (!success && attempts < 2000) {
       attempts++;
       
-      // A. Generate Terrains
       let currentTerrains = [...terrainsSource];
       shuffle(currentTerrains);
       
-      // Create Tile Objects
       let tempTiles = [];
       for(let i=0; i<19; i++) {
         tempTiles.push({ id: i, terrain: currentTerrains[i], number: null });
       }
 
-      // Check Clumping (if enabled) - Retry terrain shuffle if bad
       if (useNoClump && checkClumping(tempTiles)) continue;
 
-      // B. Assign Numbers
       let currentNumbers = [...numbersSource];
       shuffle(currentNumbers);
       
-      // Fill non-desert tiles
       for(let t of tempTiles) {
         if(t.terrain !== "desert") {
           t.number = currentNumbers.pop();
         }
       }
 
-      // C. Validate Number Placement
       if (isValidMap(tempTiles, use68Rule, use212Rule)) {
         success = true;
         finalTiles = tempTiles;
@@ -279,7 +265,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (!success) {
-      alert("Could not generate a valid map with these strict settings. Please try again.");
+      alert("Could not generate a valid map with these settings.");
       return;
     }
 
@@ -287,7 +273,10 @@ document.addEventListener("DOMContentLoaded", () => {
     boardDiv.innerHTML = "";
     updateStats(finalTiles);
 
-    // 1. Ports
+    // This variable ensures the ripple animation flows from water -> land seamlessly
+    let delayIndex = 0;
+
+    // 1. Ports & Water
     let currentPorts = [];
     if (useFixedPorts) {
       currentPorts = ["wood", "generic", "brick", "wheat", "generic", "ore", "generic", "sheep", "generic"];
@@ -300,6 +289,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const div = document.createElement("div");
       div.classList.add("hex", "ocean", `water-${i}`);
 
+      // --- ANIMATION STEP 1: Water ---
+      div.classList.add("animate-deal");
+      div.style.animationDelay = `${delayIndex * 0.05}s`;
+      delayIndex++;
+      // -------------------------------
+
       if (portPositions.hasOwnProperty(i)) {
         const portType = currentPorts.pop();
         const rotation = portPositions[i];
@@ -308,7 +303,7 @@ document.addEventListener("DOMContentLoaded", () => {
         portDiv.classList.add("port");
         portDiv.style.transform = `rotate(${rotation}deg)`;
         
-        // Harbormaster Highlighting
+        // Harbormaster
         portDiv.addEventListener("mouseenter", () => {
           boardDiv.classList.add("board-dimmed");
           portDiv.classList.add("active-port");
@@ -316,14 +311,11 @@ document.addEventListener("DOMContentLoaded", () => {
           
           allLandHexes.forEach(hex => {
             let match = false;
-            // Get number from token inside hex
             const numSpan = hex.querySelector(".token-number");
             
             if (portType === "generic") {
-               // Highlight 6 and 8
                if (numSpan && (numSpan.textContent === "6" || numSpan.textContent === "8")) match = true;
             } else {
-               // Highlight Matching Resource
                if (hex.classList.contains(portType)) match = true;
             }
             if (match) hex.classList.add("highlight-target");
@@ -352,15 +344,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 2. Land Tiles
-    finalTiles.forEach((tile, index) => { // <--- Added 'index' here
+    finalTiles.forEach(tile => {
       const div = document.createElement("div");
       div.classList.add("hex", tile.terrain, `tile-${tile.id}`);
 
-      // --- NEW ANIMATION CODE ---
+      // --- ANIMATION STEP 2: Land (continues from delayIndex) ---
       div.classList.add("animate-deal");
-      // Delay each tile by 0.05 seconds x its index (0.05, 0.10, 0.15...)
-      div.style.animationDelay = `${index * 0.05}s`; 
-      // --------------------------
+      div.style.animationDelay = `${delayIndex * 0.05}s`; 
+      delayIndex++;
+      // ----------------------------------------------------------
 
       if (tile.number !== null) {
         const token = document.createElement("div");
@@ -388,22 +380,19 @@ document.addEventListener("DOMContentLoaded", () => {
     renderIntersections(finalTiles);
   });
 
-  // --- PLAYER RANDOMIZER (SIMPLE BUTTON VERSION) ---
+  // --- PLAYER RANDOMIZER ---
   
   window.generateTurnOrder = function(count) {
     const list = document.getElementById("turn-order-list");
     if (!list) return;
     
-    list.innerHTML = ""; // Clear list
+    list.innerHTML = ""; 
 
-    // Pool of available colors
     const colors = ["Red", "Blue", "Orange", "White", "Green", "Brown"];
     shuffle(colors);
 
-    // Slice array for number of players
     const selectedPlayers = colors.slice(0, count);
 
-    // Render list
     selectedPlayers.forEach((color, index) => {
       const li = document.createElement("li");
       li.classList.add("order-item");
