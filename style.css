@@ -16,7 +16,9 @@ h1 {
   flex-direction: column; 
   align-items: center;
   gap: 15px; 
-  margin-bottom: 30px;
+  
+  /* UPDATED: Increased spacing below controls */
+  margin-bottom: 50px; 
   
   background-color: rgba(255, 255, 255, 0.5); 
   padding: 20px 40px;        
@@ -89,6 +91,9 @@ body.dark-mode .controls {
   display: flex;
   align-items: center;
   justify-content: center;
+  
+  /* PERFORMANCE: Hints for mobile GPU */
+  will-change: transform, opacity;
 }
 
 /* Terrain Colors */
@@ -114,8 +119,8 @@ body.dark-mode .controls {
   font-family: 'Times New Roman', serif;
   box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
   z-index: 10;
-  /* Ensure default text is black even in dark mode initially */
   color: #333 !important; 
+  will-change: transform, opacity;
 }
 
 /* COLOR CLASSES */
@@ -151,6 +156,7 @@ body.dark-mode .controls {
   pointer-events: auto; 
   z-index: 100;
   cursor: pointer;
+  will-change: transform;
 }
 
 .port::before,
@@ -251,13 +257,12 @@ body.dark-mode .controls {
   height: 800px;
   transform-origin: top center;
   transition: transform 0.3s ease;
-  margin-top: -70px;
+  margin-top: -70px; /* Slight offset to pull board up initially */
 }
 
 /* --- RESPONSIVE SCALING --- */
 @media (max-width: 850px) {
-  #board { transform: scale(0.7); 
-  margin: 0; }
+  #board { transform: scale(0.7); margin: 0; }
   #board-container { height: 600px; }
 }
 
@@ -411,6 +416,24 @@ body.dark-mode .controls {
   transform: scale(1.2);
 }
 
+/* --- MOBILE PERFORMANCE: Disable Heavy Hover --- */
+@media (hover: none) {
+  .port:hover, .port:active {
+    filter: none !important;
+    transform: rotate(var(--rotation)) !important; 
+  }
+  
+  .board-dimmed {
+    opacity: 1 !important;
+  }
+  
+  .highlight-target {
+    box-shadow: none !important;
+    transform: none !important;
+    z-index: 1 !important;
+  }
+}
+
 /* --- DARK MODE TOGGLE --- */
 .theme-toggle {
   position: absolute;
@@ -489,6 +512,7 @@ body.dark-mode .ocean {
   justify-content: center;
   gap: 15px;
   margin-bottom: 15px;
+  flex-wrap: wrap; /* Helps if screen is very small */
 }
 
 /* The clickable tokens */
@@ -503,11 +527,13 @@ body.dark-mode .ocean {
   transform: scale(0.9);
 }
 
-/* Specific Colors */
+/* Specific Colors - UPDATED to include Green and Brown */
 .p-opt-Red    { background-color: #d50000; }
 .p-opt-Blue   { background-color: #1565c0; }
 .p-opt-Orange { background-color: #e65100; }
 .p-opt-White  { background-color: #ffffff; border: 2px solid #ccc; }
+.p-opt-Green  { background-color: #4caf50; }
+.p-opt-Brown  { background-color: #795548; }
 
 /* STATE: Selected (Active) */
 .p-token.selected {
@@ -516,20 +542,6 @@ body.dark-mode .ocean {
   box-shadow: 0 4px 6px rgba(0,0,0,0.3);
   border-color: #333; 
 }
-
-/* Checkmark indicator for selected items */
-/*.p-token.selected::after {
-  content: "✓";
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  font-size: 16px;
-  font-weight: bold;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-}
-.p-token.p-opt-White.selected::after { color: #333; text-shadow: none; }*/
 
 /* --- ROLL BUTTON --- */
 #roll-order-btn {
@@ -572,7 +584,7 @@ body.dark-mode .ocean {
   font-weight: bold;
 }
 
-/* Color indicators for the text */
+/* Color indicators for the text - UPDATED */
 .p-Red { color: #d50000; }
 .p-Blue { color: #1565c0; }
 .p-White { color: #9e9e9e; text-shadow: 0 0 1px #333; }
@@ -589,4 +601,11 @@ body.dark-mode .ocean {
 .animate-deal {
   animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   opacity: 0; /* Important: Start invisible so they don't flash before animating */
+}
+
+/* PERFORMANCE: Class applied by JS when animation ends to free up memory */
+.animation-finished {
+  opacity: 1 !important;
+  transform: scale(1) !important;
+  animation: none !important;
 }
