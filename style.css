@@ -418,3 +418,33 @@ body.dark-mode .stat-value {color: #333333;}
   animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
 }
 .animation-finished { opacity: 1 !important; transform: scale(1) !important; animation: none !important; }
+
+/* ==========================================================================
+   9. LAYOUT & RESPONSIVENESS
+   ========================================================================== */
+
+/* default: Side-by-side for big screens */
+.game-container {
+  display: flex;
+  flex-direction: row;       /* Side by side */
+  justify-content: center;   /* Center them */
+  align-items: flex-start;   /* Align tops */
+  gap: 40px;                 /* Space between board and panel */
+  margin-top: 20px;
+}
+
+/* TABLET/PORTRAIT MODE OVERRIDE */
+/* Trigger this when screen is narrower than 1100px (typical tablet portrait) */
+@media (max-width: 1100px) {
+  .game-container {
+    flex-direction: column;  /* Stack them vertically! */
+    align-items: center;     /* Center everything */
+  }
+
+  #stats-panel {
+    width: 100%;             /* Let it span the width if needed */
+    max-width: 400px;        /* But don't let it get huge */
+    margin-top: 30px;        /* Add space between board and panel */
+    margin-left: 0;          /* Reset any old margins */
+  }
+}
