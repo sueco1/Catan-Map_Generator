@@ -4,7 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Catan Map Generator</title>
-  <link rel="stylesheet" href="style.css">
+  
+  <script>
+    var ver = new Date().getTime(); 
+    document.write('<link rel="stylesheet" href="style.css?v=' + ver + '">');
+  </script>
 </head>
 <body>
 
@@ -20,7 +24,7 @@
     
     <div class="toggles-wrapper">
       <label class="toggle-container">
-        <input type="checkbox" id="red-rule-toggle" checked>
+        <input type="checkbox" id="prevent-6-8" checked>
         <span>Separate 6 & 8</span>
       </label>
 
@@ -97,6 +101,9 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    var ver = new Date().getTime();
+    document.write('<script src="script.js?v=' + ver + '"><\/script>');
+  </script>
 </body>
 </html>
