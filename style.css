@@ -398,15 +398,15 @@ body.dark-mode .stat-value {color: #333333;}
    :not(.port-wrapper) ensures we don't dim the invisible port containers,
    which would accidentally dim the active ports inside them. */
 .board-dimmed .hex:not(.port-wrapper):not(.highlight-target) {
-  opacity: 0.15;
-  filter: grayscale(80%);
+  opacity: 0.5 !important;
+  filter: grayscale(50%);
   transition: all 0.2s ease;
 }
 
 /* Dim all Ports that are NOT active */
 .board-dimmed .port:not(.active-port) {
-  opacity: 0.15;
-  filter: grayscale(100%);
+  opacity: 0.5;
+  filter: grayscale(50%);
   transition: all 0.2s ease;
 }
 
