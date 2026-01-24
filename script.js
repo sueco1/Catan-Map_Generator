@@ -3,7 +3,6 @@
    ========================================================================== */
 
 // --- Terrain & Port Data ---
-// 4 Wood, 3 Brick, 4 Sheep, 4 Wheat, 3 Ore, 1 Desert
 const terrainsSource = [
   "wood", "wood", "wood", "wood",
   "brick", "brick", "brick",
@@ -14,7 +13,6 @@ const terrainsSource = [
 ];
 
 // --- Number Tokens ---
-// 2, 12 appear once. Others appear twice.
 const numbersSource = [
   2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12
 ];
@@ -196,9 +194,11 @@ function updateStats(tiles) {
   const maxVal = Math.max(...Object.values(counts), 1);
 
   for (let key in counts) {
-    statVals[key].textContent = counts[key];
-    const pct = (counts[key] / maxVal) * 100;
-    statBars[key].style.width = `${pct}%`;
+    if(statVals[key]) {
+        statVals[key].textContent = counts[key];
+        const pct = (counts[key] / maxVal) * 100;
+        statBars[key].style.width = `${pct}%`;
+    }
   }
 }
 
@@ -218,7 +218,7 @@ genBtn.addEventListener("click", () => {
   let finalTiles = [];
 
   // 2. Loop until valid map found
-  while (!success && attempts < 2000) {
+  while (!success && attempts < 100000) {
     attempts++;
     
     let currentTerrains = [...terrainsSource];
@@ -258,7 +258,7 @@ genBtn.addEventListener("click", () => {
   let delayIndex = 0; 
   const isMobile = window.matchMedia("(hover: none)").matches;
 
-  // 1. Ports & Water
+  // 1. Define Ports List
   let currentPorts = [];
   if (useFixedPorts) {
     currentPorts = ["ore", "generic", "wheat", "sheep", "generic", "generic", "wood", "brick", "generic"];
@@ -267,48 +267,82 @@ genBtn.addEventListener("click", () => {
     shuffle(currentPorts);
   }
 
+  // 2. Render Water Tiles & Ports (Background Layer)
   for (let i = 0; i < 18; i++) {
+    // A. CALCULATE DELAY ONCE FOR THIS PAIR
+    const currentDelay = `${delayIndex * 0.05}s`;
+
+    // B. CREATE WATER TILE
     const div = document.createElement("div");
     div.classList.add("hex", "ocean", `water-${i}`);
-
-    // Animation
-    div.classList.add("animate-deal");
-    div.style.animationDelay = `${delayIndex * 0.05}s`;
     
-    // PERF: Cleanup
+    div.classList.add("animate-deal");
+    div.style.animationDelay = currentDelay;
     div.addEventListener('animationend', () => {
       div.classList.remove('animate-deal');
       div.classList.add('animation-finished');
     }, { once: true });
     
-    delayIndex++;
+    boardDiv.appendChild(div);
 
+    // C. CREATE PORT (IF EXISTS) WITH SAME DELAY
     if (portPositions.hasOwnProperty(i)) {
       const portType = currentPorts.pop();
       const rotation = portPositions[i];
       
+      const portWrapper = document.createElement("div");
+      portWrapper.classList.add("hex", `water-${i}`, "port-wrapper");
+      
+      // Floating invisible layer settings
+      portWrapper.style.background = "transparent";
+      portWrapper.style.clipPath = "none"; 
+      portWrapper.style.zIndex = "500"; 
+      portWrapper.style.pointerEvents = "none"; 
+
+      // --- FIX: ANIMATE PORT WITH WATER ---
+      portWrapper.classList.add("animate-deal");
+      portWrapper.style.animationDelay = currentDelay; // Sync with water
+      portWrapper.addEventListener('animationend', () => {
+        portWrapper.classList.remove('animate-deal');
+        portWrapper.classList.add('animation-finished');
+      }, { once: true });
+      // ------------------------------------
+      
+      // Create the Port Stick
       const portDiv = document.createElement("div");
       portDiv.classList.add("port");
       portDiv.style.transform = `rotate(${rotation}deg)`;
       portDiv.style.setProperty('--rotation', `${rotation}deg`);
-      
-      // Hover Logic (Desktop Only)
+      portDiv.style.pointerEvents = "auto"; 
+
+      // --- HOVER LOGIC ---
       if (!isMobile) {
           portDiv.addEventListener("mouseenter", () => {
             boardDiv.classList.add("board-dimmed");
             portDiv.classList.add("active-port");
-            const allLandHexes = document.querySelectorAll(".hex:not(.ocean)");
+            
+            const allLandHexes = document.querySelectorAll(".hex:not(.ocean):not(.port-wrapper)");
             
             allLandHexes.forEach(hex => {
               let match = false;
-              const numSpan = hex.querySelector(".token-number");
               
               if (portType === "generic") {
-                 if (numSpan && (numSpan.textContent === "6" || numSpan.textContent === "8")) match = true;
+                 const numSpan = hex.querySelector(".token-number");
+                 if (numSpan) {
+                     const val = numSpan.textContent;
+                     if (val === "6" || val === "8") {
+                         match = true;
+                     }
+                 }
               } else {
-                 if (hex.classList.contains(portType)) match = true;
+                 if (hex.classList.contains(portType)) {
+                     match = true;
+                 }
               }
-              if (match) hex.classList.add("highlight-target");
+              
+              if (match) {
+                  hex.classList.add("highlight-target");
+              }
             });
           });
 
@@ -329,12 +363,16 @@ genBtn.addEventListener("click", () => {
       
       iconDiv.appendChild(textSpan);
       portDiv.appendChild(iconDiv);
-      div.appendChild(portDiv);
+      
+      portWrapper.appendChild(portDiv);
+      boardDiv.appendChild(portWrapper);
     }
-    boardDiv.appendChild(div);
+
+    // Increment Delay AFTER both water and port are handled
+    delayIndex++;
   }
 
-  // 2. Land Tiles
+  // 3. Land Tiles (Middle Layer)
   finalTiles.forEach(tile => {
     const div = document.createElement("div");
     div.classList.add("hex", tile.terrain, `tile-${tile.id}`);
@@ -371,7 +409,7 @@ genBtn.addEventListener("click", () => {
     boardDiv.appendChild(div);
   });
 
-  // 3. Intersections
+  // 4. Intersections
   renderIntersections(finalTiles);
 });
 
@@ -380,51 +418,30 @@ genBtn.addEventListener("click", () => {
    ========================================================================== */
 
 function renderIntersections(tiles) {
-  // Coordinates for the 6 corners of a hex (relative to center)
-  // Hex size 100x115. Center to corner is roughly 58px vertically.
-  // We'll calculate absolute positions based on hex .top/.left
+  const intersectionMap = {}; 
   
-  // NOTE: This is a simplified approach. 
-  // We scan every tile, calculate its 6 corners, key them by coordinate string "x,y", 
-  // and store the pips.
-  
-  const intersectionMap = {}; // Key: "x,y", Value: { pips: 0 }
-  const THRESHOLD = 10; // pixel tolerance to snap corners together
-
   tiles.forEach(tile => {
-    if (tile.terrain === 'desert') return; // Desert has 0 pips usually? Or do we count it as 0? 
-    // Actually, desert has no number, so pips=0.
+    if (tile.terrain === 'desert') return; 
     
     const tilePips = tile.number ? pipMap[tile.number] : 0;
-    
-    // Get the element to find its top/left
     const el = document.querySelector(`.tile-${tile.id}`);
     if (!el) return;
     
-    // Parse top/left from computed style or the class CSS
-    // Using simple offset lookup since we know the grid
     const style = getComputedStyle(el);
     const top = parseInt(style.top);
     const left = parseInt(style.left);
-    
-    // Hex Center
     const cx = left + 50; 
-    const cy = top + 57.5;
     
-    // 6 Corners (approximate for flat-topped hex, but this CSS is pointy-topped)
-    // CSS Clip path: 50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%
-    // Width 100, Height 115.
     const corners = [
-      { x: cx, y: top },             // Top Center
-      { x: left + 100, y: top + 29 }, // Top Right
-      { x: left + 100, y: top + 86 }, // Bottom Right
-      { x: cx, y: top + 115 },       // Bottom Center
-      { x: left, y: top + 86 },      // Bottom Left
-      { x: left, y: top + 29 }       // Top Left
+      { x: cx, y: top },             
+      { x: left + 100, y: top + 29 }, 
+      { x: left + 100, y: top + 86 }, 
+      { x: cx, y: top + 115 },       
+      { x: left, y: top + 86 },      
+      { x: left, y: top + 29 }       
     ];
 
     corners.forEach(c => {
-      // Round to nearest 5 to snap
       const sx = Math.round(c.x / 5) * 5;
       const sy = Math.round(c.y / 5) * 5;
       const key = `${sx},${sy}`;
@@ -436,24 +453,13 @@ function renderIntersections(tiles) {
     });
   });
 
-  // Render the dots
   Object.values(intersectionMap).forEach(pt => {
-    // Only show high pip spots? Or all? Let's show all for debugging or hover.
-    // For UI cleanliness, maybe only invisible div that appears on hover.
-    
     const dot = document.createElement('div');
     dot.classList.add('intersection');
     dot.style.left = `${pt.x}px`;
     dot.style.top = `${pt.y}px`;
     dot.dataset.pips = pt.pips;
-    dot.textContent = pt.pips; // Number inside
-    
-    // Color coding for high spots
-    if(pt.pips >= 10) {
-       // dot.style.backgroundColor = "gold"; 
-       // (Handled in CSS now)
-    }
-
+    dot.textContent = pt.pips; 
     boardDiv.appendChild(dot);
   });
 }
@@ -481,32 +487,24 @@ function rollTurnOrder() {
     return;
   }
 
-  // 1. Roll the dice
   let results = selectedPlayers.map(p => {
     return { color: p, roll: Math.floor(Math.random() * 6) + 1 + Math.floor(Math.random() * 6) + 1 };
   });
 
-  // 2. Sort by roll (highest to lowest)
   results.sort((a, b) => b.roll - a.roll);
 
-  // 3. Define the labels
   const rankNames = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth"];
 
-  // 4. Render the list
   results.forEach((item, index) => {
     const li = document.createElement("li");
     li.classList.add("order-item");
     
     const spanName = document.createElement("span");
-    // e.g. "Red"
     spanName.textContent = item.color;
     spanName.classList.add(`p-${item.color}`); 
     
     const spanRank = document.createElement("span");
-    // e.g. "First" (based on the current index)
     spanRank.textContent = rankNames[index];
-    
-    // Optional: Add a subtle style to the rank text
     spanRank.style.color = "#888"; 
     spanRank.style.fontSize = "0.9em";
 
@@ -520,14 +518,16 @@ function rollTurnOrder() {
    8. DARK MODE TOGGLE
    ========================================================================== */
 
-themeToggle.addEventListener("click", () => {
-  document.body.classList.toggle("dark-mode");
-  
-  if (document.body.classList.contains("dark-mode")) {
-    sunIcon.classList.remove("active");
-    moonIcon.classList.add("active");
-  } else {
-    sunIcon.classList.add("active");
-    moonIcon.classList.remove("active");
-  }
-});
+if (themeToggle) {
+    themeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark-mode");
+      
+      if (document.body.classList.contains("dark-mode")) {
+        if(sunIcon) sunIcon.classList.remove("active");
+        if(moonIcon) moonIcon.classList.add("active");
+      } else {
+        if(sunIcon) sunIcon.classList.add("active");
+        if(moonIcon) moonIcon.classList.remove("active");
+      }
+    });
+}

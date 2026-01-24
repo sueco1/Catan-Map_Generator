@@ -1,5 +1,5 @@
 /* ==========================================================================
-   1. SETTINGS & VARIABLES (CHANGE COLORS HERE)
+   1. SETTINGS & VARIABLES
    ========================================================================== */
 :root {
   /* --- BACKGROUND COLORS --- */
@@ -46,8 +46,7 @@ h1 { margin-bottom: 10px; }
   flex-direction: column; 
   align-items: center;
   gap: 15px; 
-  /* SETTING: Spacing below the buttons */
-  margin-bottom: 50px; 
+  margin-bottom: 20px; 
   
   background-color: rgba(255, 255, 255, 0.5); 
   padding: 20px 40px;        
@@ -99,7 +98,7 @@ h1 { margin-bottom: 10px; }
 .toggle-container input {
   width: 16px;
   height: 16px;
-  accent-color: var(--p-red);
+  accent-color: var(--btn-color);
   cursor: pointer;
 }
 
@@ -107,15 +106,27 @@ h1 { margin-bottom: 10px; }
    3. BOARD PIECES (HEXES, PORTS, TOKENS)
    ========================================================================== */
 .hex {
-  /* SETTING: Hex Size */
   width: 100px;
-  height: 115px; 
+  height: 115.47px;
   
+  /* POSITIONING */
   position: absolute;
+  z-index: 1;
+  
+  /* SHAPE */
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  
+  /* LAYOUT */
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  
+  /* --- GAP FIX --- */
+  transform: scale(1.03) translateZ(0); 
+  transform-origin: center;
+  will-change: transform;
+  
+  margin: 0;
 }
 
 /* Mapping Classes to Variables */
@@ -142,6 +153,7 @@ h1 { margin-bottom: 10px; }
   box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
   z-index: 10;
   color: #333 !important; 
+  transition: opacity 0.2s ease;
 }
 
 .token.red { color: var(--p-red) !important; }
@@ -154,14 +166,19 @@ h1 { margin-bottom: 10px; }
 .port {
   width: 100%; height: 100%;
   display: flex; align-items: center; justify-content: center;
-  position: absolute; pointer-events: auto; z-index: 100;
+  position: absolute; 
+  pointer-events: auto; /* Ensures the mouse event fires for JS */
+  z-index: 100; /* Keeps it above hexes so hover is detected */
   cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
+/* Clicks pass through the white sticks to the icon */
 .port::before, .port::after {
   content: ""; position: absolute; width: 4px; height: 48px; 
   background: #fff; top: 50%; left: 50%;
   transform-origin: top center; z-index: 1; border-radius: 2px;
+  pointer-events: none; 
 }
 .port::before { transform: translate(-50%, 0) rotate(-30deg); }
 .port::after  { transform: translate(-50%, 0) rotate(30deg); }
@@ -177,7 +194,7 @@ h1 { margin-bottom: 10px; }
 }
 
 /* Port Colors mapped to variables */
-.port-icon.wood  { background: #4caf50; color: black; } /* Slightly brighter green for icon */
+.port-icon.wood  { background: #4caf50; color: black; } 
 .port-icon.sheep { background: var(--c-sheep); color: black; }
 .port-icon.wheat { background: #ffeb3b; color: black; }
 .port-icon.brick { background: #f44336; color: black; }
@@ -233,73 +250,66 @@ h1 { margin-bottom: 10px; }
 #board-container {
   position: relative;
   width: 100%;
-  height: 850px; 
-  overflow: hidden; 
-  padding-top: 20px;
-  display: block; 
+  min-height: 650px; 
+  overflow: visible; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #board {
   position: relative; 
   width: 800px;
-  height: 800px;
+  height: 700px;
+  transform: scale(0.9);
   transform-origin: top center;
-  transition: transform 0.3s ease;
-  transform: scale(0.85); /* Adjust this to Zoom In/Out */
-  margin-top: -65px;
+  margin: 0 auto;
 }
 
 /* ==========================================================================
    6. RESPONSIVE / MOBILE SETTINGS
    ========================================================================== */
-@media (max-width: 850px) {
-  #board { transform: scale(0.7); margin: 0; }
-  #board-container { height: 600px; }
+@media (max-width: 900px) {
+  #board { transform: scale(0.75); }
+  #board-container { min-height: 550px; }
 }
 
-/* --- MOBILE SPECIFIC (PHONES) --- */
 @media (max-width: 600px) {
-  
-  /* SETTING: Reduce space above board */
-  .controls { margin-bottom: 10px !important; }
-
-  /* SETTING: Mobile Container Height */
+  .controls { margin-bottom: 5px !important; }
   #board-container {
-    height: 430px; 
-    padding: 0; margin: 0;
+    min-height: 400px; 
+    height: 400px;
+    padding: 0; 
     overflow: hidden; 
   }
-  
-  /* SETTING: Mobile Scale */
   #board {
-    position: absolute; 
-    top: 0; 
-    left: 50%; 
-    margin-left: -400px; 
+    transform: scale(0.52);
     transform-origin: top center;
-    transform: scale(0.52); /* Adjust this to Zoom In/Out */
-  }
-
-  /* SETTING: Stats Panel Position */
-  #stats-panel {
-    margin-top: 0px; 
-    width: 90%; 
-    max-width: 400px;
-    margin-bottom: 40px;
+    left: 50%;
+    margin-left: -400px; 
+    top: 0;
   }
 }
 
 /* ==========================================================================
    7. STATS PANEL & TURN ORDER
    ========================================================================== */
-.game-layout {
-  display: flex; justify-content: center; align-items: flex-start;
-  gap: 40px; max-width: 1200px; margin: 0 auto;
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 10px;
 }
 
 #stats-panel {
   background: white; padding: 20px; border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 280px; margin-top: 40px; 
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 280px; 
+  margin-top: 20px; 
+  margin-bottom: 50px;
+  z-index: 200; 
+  position: relative;
 }
 #stats-panel h3 { margin-top: 0; text-align: center; color: #333; }
 
@@ -310,7 +320,6 @@ h1 { margin-bottom: 10px; }
 .bar-container { flex-grow: 1; background: #eee; height: 12px; border-radius: 6px; margin: 0 10px; overflow: hidden; }
 .bar { height: 100%; width: 0%; transition: width 0.5s ease; border-radius: 6px; }
 
-/* Bar Colors */
 .wood-bar { background-color: var(--c-wood); }
 .brick-bar { background-color: var(--c-brick); }
 .sheep-bar { background-color: var(--c-sheep); }
@@ -329,7 +338,6 @@ h1 { margin-bottom: 10px; }
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
 }
 
-/* Player Colors Mapped */
 .p-opt-Red    { background-color: var(--p-red); }
 .p-opt-Blue   { background-color: var(--p-blue); }
 .p-opt-Orange { background-color: var(--p-orange); }
@@ -349,7 +357,6 @@ h1 { margin-bottom: 10px; }
 #turn-order-list { padding: 0; margin: 0; list-style: none; text-align: left; padding-left: 20px; }
 .order-item { background: #f9f9f9; border-bottom: 1px solid #eee; padding: 8px 10px; display: flex; justify-content: space-between; font-weight: bold; }
 
-/* List Text Colors */
 .p-Red { color: var(--p-red); }
 .p-Blue { color: var(--p-blue); }
 .p-White { color: #fff; text-shadow: 0 0 3px #000000; }
@@ -365,7 +372,6 @@ body.dark-mode .controls { background-color: #34495e; color: #fff; }
 body.dark-mode .toggle-container { color: #333; }
 body.dark-mode .ocean { opacity: 0.8; filter: brightness(1.2); }
 
-/* Alternative: Keep panel white, force text black */
 body.dark-mode #stats-panel {background-color: #ffffff; color: #333333;}
 body.dark-mode .stat-label, 
 body.dark-mode .stat-value {color: #333333;}
@@ -382,15 +388,58 @@ body.dark-mode .stat-value {color: #333333;}
   box-shadow: 0 0 5px rgba(0,0,0,0.5); font-size: 14px; font-weight: bold; color: #000; z-index: 60;
 }
 
-/* --- HARBORMASTER & MOBILE PERF --- */
-.board-dimmed .hex { opacity: 0.2; filter: grayscale(5%); transition: all 0.3s ease; }
-.board-dimmed .hex.highlight-target { opacity: 1; filter: grayscale(0%); transform: scale(1.1); z-index: 20; box-shadow: 0 0 20px rgba(255, 255, 255, 0.6); }
+/* ==========================================================================
+   9. HARBORMASTER HOVER LOGIC (FIXED)
+   ========================================================================== */
 
-@media (hover: none) {
-  .port:hover, .port:active { filter: none !important; transform: rotate(var(--rotation)) !important; }
-  .board-dimmed { opacity: 1 !important; }
-  .highlight-target { box-shadow: none !important; transform: none !important; z-index: 1 !important; }
+/* 1. Base State: When board is dimmed... */
+
+/* Dim all Land and Ocean tiles that are NOT targets.
+   :not(.port-wrapper) ensures we don't dim the invisible port containers,
+   which would accidentally dim the active ports inside them. */
+.board-dimmed .hex:not(.port-wrapper):not(.highlight-target) {
+  opacity: 0.15;
+  filter: grayscale(80%);
+  transition: all 0.2s ease;
 }
+
+/* Dim all Ports that are NOT active */
+.board-dimmed .port:not(.active-port) {
+  opacity: 0.15;
+  filter: grayscale(100%);
+  transition: all 0.2s ease;
+}
+
+/* 2. Highlight State: The Target Land Hexes */
+.board-dimmed .hex.highlight-target {
+  opacity: 1 !important;
+  z-index: 600; /* Must be higher than the port wrappers (500) */
+  transform: scale(1.08); /* Pop out effect */
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.8);
+  filter: none;
+}
+
+/* Ensure tokens on highlighted hexes look sharp */
+.board-dimmed .hex.highlight-target .token {
+  opacity: 1;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+}
+
+/* 3. Highlight State: The Active Port */
+/* Force the wrapper of the active port to stay fully opaque.
+   (The Wrapper is transparent, but its opacity controls the child) */
+.board-dimmed .hex.port-wrapper {
+    opacity: 1 !important;
+}
+
+/* The actual port stick/icon */
+.board-dimmed .port.active-port {
+  opacity: 1 !important;
+  filter: none;
+  z-index: 1000;
+  transform: scale(1.15) rotate(var(--rotation)); /* Slight zoom + keep rotation */
+}
+
 
 /* --- THEME TOGGLE ICON --- */
 .theme-toggle {
@@ -403,8 +452,6 @@ body.dark-mode .stat-value {color: #333333;}
 @media (max-width: 600px) {
   .theme-toggle { top: 10px; right: 10px; padding: 4px 8px; gap: 6px; }
   .theme-toggle .icon { font-size: 18px; }
-  .game-layout { flex-direction: column; align-items: center; gap: 0; }
-  #stats-panel { width: 90%; max-width: 400px; margin-top: 10px; margin-bottom: 40px; }
 }
 
 /* --- ANIMATION --- */
@@ -420,53 +467,41 @@ body.dark-mode .stat-value {color: #333333;}
 .animation-finished { opacity: 1 !important; transform: scale(1) !important; animation: none !important; }
 
 /* ==========================================================================
-   9. LAYOUT & RESPONSIVENESS
+   10. LAYOUT & RESPONSIVENESS
    ========================================================================== */
 
-/* DEFAULT: Vertical Stack (Mobile, Tablet, Small Laptop) 
-   This ensures the board is ALWAYS centered and nothing is cut off. */
+/* STANDARD LAYOUT: Vertical Stack */
 .game-container {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centers the board horizontally */
+  align-items: center; 
   gap: 20px;
   width: 100%;
   margin-top: 10px;
 }
 
 #board-container {
-  /* Keeps the hex grid clean */
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: block; 
+  height: auto;
 }
 
-#stats-panel {
-  width: 90%;
-  max-width: 400px;
-  margin-top: 10px;
-}
-
-/* LARGE SCREENS ONLY (> 1300px) 
-   Switch to Side-by-Side ONLY if there is enough room to 
-   keep the board in the true center without cropping the panel. */
+/* LARGE SCREENS (> 1300px): Side by Side */
 @media (min-width: 1300px) {
   .game-container {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr; /* Left Space | Board | Right Space */
-    align-items: start;
-    gap: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 40px;
   }
-
+  
   #board-container {
-    grid-column: 2; /* Forces board into the exact center of the screen */
+    flex: 0 0 auto;
+    width: 800px;
   }
 
   #stats-panel {
-    grid-column: 3; /* Puts panel in the right-hand empty space */
-    width: 350px;
-    margin-top: 40px; /* Aligns visually with the board top */
-    margin-left: 20px;
-    justify-self: start;
+    margin-top: 80px; 
+    width: 300px;
   }
 }
