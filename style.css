@@ -1,45 +1,68 @@
+/* ==========================================================================
+   1. SETTINGS & VARIABLES (CHANGE COLORS HERE)
+   ========================================================================== */
+:root {
+  /* --- BACKGROUND COLORS --- */
+  --bg-color-light: #e0f7fa;
+  --bg-color-dark: #2c3e50;
+  
+  /* --- TERRAIN COLORS --- */
+  --c-wood:   #2e7d32;
+  --c-brick:  #d84315;
+  --c-sheep:  #8bc34a;
+  --c-wheat:  #fbc02d;
+  --c-ore:    #78909c;
+  --c-desert: #c2b280;
+  --c-ocean:  #0288d1;
+
+  /* --- PLAYER COLORS --- */
+  --p-red:    #d50000;
+  --p-blue:   #1565c0;
+  --p-orange: #e65100;
+  --p-white:  #ffffff;
+  --p-green:  #4caf50;
+  --p-brown:  #795548;
+
+  /* --- UI COLORS --- */
+  --btn-color: #00796b;
+  --btn-hover: #004d40;
+}
+
 body {
   font-family: sans-serif;
   text-align: center;
-  background-color: #e0f7fa; 
+  background-color: var(--bg-color-light); 
   margin: 0;
   padding: 20px;
 }
 
-h1 {
-  margin-bottom: 10px;
-}
+h1 { margin-bottom: 10px; }
 
-/* --- CONTROLS SECTION --- */
+/* ==========================================================================
+   2. CONTROLS & UI
+   ========================================================================== */
 .controls {
   display: flex;
   flex-direction: column; 
   align-items: center;
   gap: 15px; 
-  
-  /* UPDATED: Increased spacing below controls */
+  /* SETTING: Spacing below the buttons */
   margin-bottom: 50px; 
   
   background-color: rgba(255, 255, 255, 0.5); 
   padding: 20px 40px;        
   border-radius: 25px;       
   box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-  
   width: fit-content;
   margin-left: auto;
   margin-right: auto;
-}
-
-body.dark-mode .controls {
-  background-color: #34495e; 
-  color: #fff;
 }
 
 #gen-btn {
   font-size: 18px;
   padding: 10px 30px; 
   cursor: pointer;
-  background-color: #00796b;
+  background-color: var(--btn-color);
   color: white;
   border: none;
   border-radius: 8px;
@@ -47,11 +70,9 @@ body.dark-mode .controls {
   transition: background 0.2s;
 }
 
-#gen-btn:hover {
-  background-color: #004d40;
-}
+#gen-btn:hover { background-color: var(--btn-hover); }
 
-/* --- TOGGLES WRAPPER --- */
+/* --- TOGGLES --- */
 .toggles-wrapper {
   display: flex;
   flex-direction: row; 
@@ -78,34 +99,36 @@ body.dark-mode .controls {
 .toggle-container input {
   width: 16px;
   height: 16px;
-  accent-color: #d50000;
+  accent-color: var(--p-red);
   cursor: pointer;
 }
 
-/* --- HEXAGON STYLING --- */
+/* ==========================================================================
+   3. BOARD PIECES (HEXES, PORTS, TOKENS)
+   ========================================================================== */
 .hex {
+  /* SETTING: Hex Size */
   width: 100px;
   height: 115px; 
+  
   position: absolute;
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   display: flex;
   align-items: center;
   justify-content: center;
-  
-  /* PERFORMANCE: Hints for mobile GPU */
   will-change: transform, opacity;
 }
 
-/* Terrain Colors */
-.wood   { background-color: #2e7d32; } 
-.brick  { background-color: #d84315; } 
-.sheep  { background-color: #8bc34a; } 
-.wheat  { background-color: #fbc02d; } 
-.ore    { background-color: #78909c; } 
-.desert { background-color: #c2b280; } 
-.ocean  { background-color: #0288d1; opacity: 0.5; } 
+/* Mapping Classes to Variables */
+.wood   { background-color: var(--c-wood); } 
+.brick  { background-color: var(--c-brick); } 
+.sheep  { background-color: var(--c-sheep); } 
+.wheat  { background-color: var(--c-wheat); } 
+.ore    { background-color: var(--c-ore); } 
+.desert { background-color: var(--c-desert); } 
+.ocean  { background-color: var(--c-ocean); opacity: 0.5; } 
 
-/* --- TOKEN (NUMBER CHIT) --- */
+/* --- TOKENS (NUMBERS) --- */
 .token {
   width: 35px;
   height: 35px;
@@ -123,84 +146,49 @@ body.dark-mode .controls {
   will-change: transform, opacity;
 }
 
-/* COLOR CLASSES */
-.token.red {
-  color: #d50000 !important; /* Red for 6 & 8 */
-}
+.token.red { color: var(--p-red) !important; }
+.token.orange { color: var(--p-orange) !important; }
 
-.token.orange {
-  color: #e65100 !important; /* Orange for 5 & 9 */
-}
+.token-number { font-size: 16px; font-weight: bold; line-height: 1; }
+.token-pips { font-size: 14px; line-height: 0.6; font-weight: bold; letter-spacing: -1px; }
 
-.token-number {
-  font-size: 16px;
-  font-weight: bold;
-  line-height: 1;
-}
-
-.token-pips {
-  font-size: 14px; 
-  line-height: 0.6;
-  font-weight: bold;
-  letter-spacing: -1px; 
-}
-
-/* --- PORTS (V-SHAPE) --- */
+/* --- PORTS --- */
 .port {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  pointer-events: auto; 
-  z-index: 100;
-  cursor: pointer;
-  will-change: transform;
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  position: absolute; pointer-events: auto; z-index: 100;
+  cursor: pointer; will-change: transform;
 }
 
-.port::before,
-.port::after {
-  content: "";
-  position: absolute;
-  width: 4px;
-  height: 48px; 
-  background: #fff;
-  top: 50%;
-  left: 50%;
-  transform-origin: top center;
-  z-index: 1; 
-  border-radius: 2px;
+.port::before, .port::after {
+  content: ""; position: absolute; width: 4px; height: 48px; 
+  background: #fff; top: 50%; left: 50%;
+  transform-origin: top center; z-index: 1; border-radius: 2px;
 }
-
 .port::before { transform: translate(-50%, 0) rotate(-30deg); }
 .port::after  { transform: translate(-50%, 0) rotate(30deg); }
 
 .port-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 2px solid #fff;
-  background: white; 
-  color: #333;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: bold;
-  z-index: 5;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  width: 32px; height: 32px;
+  border-radius: 50%; border: 2px solid #fff;
+  background: white; color: #333;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: bold;
+  z-index: 5; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
   position: relative; 
 }
 
-.port-icon.wood  { background: #4caf50; color: black; }
-.port-icon.sheep { background: #8bc34a; color: black; }
+/* Port Colors mapped to variables */
+.port-icon.wood  { background: #4caf50; color: black; } /* Slightly brighter green for icon */
+.port-icon.sheep { background: var(--c-sheep); color: black; }
 .port-icon.wheat { background: #ffeb3b; color: black; }
 .port-icon.brick { background: #f44336; color: black; }
 .port-icon.ore   { background: #9e9e9e; color: black; }
 .port-icon.generic { background: #eee; color: black; }
 
-/* Coordinates (Standard Spiral Layout) */
+/* ==========================================================================
+   4. COORDINATES (POSITIONS)
+   ========================================================================== */
 .tile-0 { top: 150px; left: 250px; }
 .tile-1 { top: 150px; left: 350px; }
 .tile-2 { top: 150px; left: 450px; }
@@ -241,7 +229,9 @@ body.dark-mode .controls {
 .water-16{ top: 580px; left: 400px; }
 .water-17{ top: 580px; left: 500px; }
 
-/* --- BOARD CONTAINER --- */
+/* ==========================================================================
+   5. BOARD CONTAINER
+   ========================================================================== */
 #board-container {
   position: relative;
   width: 100%;
@@ -257,367 +247,167 @@ body.dark-mode .controls {
   height: 800px;
   transform-origin: top center;
   transition: transform 0.3s ease;
-  margin-top: -70px; /* Slight offset to pull board up initially */
+  margin-top: -70px;
 }
 
-/* --- RESPONSIVE SCALING --- */
+/* ==========================================================================
+   6. RESPONSIVE / MOBILE SETTINGS
+   ========================================================================== */
 @media (max-width: 850px) {
   #board { transform: scale(0.7); margin: 0; }
   #board-container { height: 600px; }
 }
 
-/* --- GAME LAYOUT --- */
-.game-layout {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 40px; 
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-/* --- STATS PANEL --- */
-#stats-panel {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  width: 280px;
-  margin-top: 40px; 
-}
-
-#stats-panel h3 {
-  margin-top: 0;
-  text-align: center;
-  color: #333;
-}
-
-.stat-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.stat-label { width: 50px; font-weight: bold; font-size: 14px; }
-.stat-value { width: 30px; text-align: right; font-weight: bold; }
-
-.bar-container {
-  flex-grow: 1;
-  background: #eee;
-  height: 12px;
-  border-radius: 6px;
-  margin: 0 10px;
-  overflow: hidden;
-}
-
-.bar {
-  height: 100%;
-  width: 0%; 
-  transition: width 0.5s ease;
-  border-radius: 6px;
-}
-
-.wood-bar { background-color: #228b22; }
-.brick-bar { background-color: #e34234; }
-.sheep-bar { background-color: #8bc34a; }
-.wheat-bar { background-color: #fdd835; }
-.ore-bar { background-color: #78909c; }
-
-/* --- MOBILE ADJUSTMENTS --- */
-@media (max-width: 1200px) {
-  .game-layout {
-    flex-direction: column; 
-    align-items: center;
-    gap: 0;
-  }
-  #stats-panel {
-    width: 90%; 
-    max-width: 400px;
-    margin-top: 10px;
-    margin-bottom: 40px;
-  }
-}
-
+/* --- MOBILE SPECIFIC (PHONES) --- */
 @media (max-width: 600px) {
+  
+  /* SETTING: Reduce space above board */
+  .controls { margin-bottom: 10px !important; }
 
-  .controls {
-    margin-bottom: 10px !important; /* Reduces gap between buttons and board */
-  }
-
+  /* SETTING: Mobile Container Height */
   #board-container {
-    height: 460px; 
+    height: 430px; 
     padding: 0; margin: 0;
     overflow: hidden; 
   }
+  
+  /* SETTING: Mobile Scale */
   #board {
     position: absolute; 
-    top: 0px; left: 50%; 
+    top: 0; 
+    left: 50%; 
     margin-left: -400px; 
     transform-origin: top center;
-    transform: scale(0.52); 
+    transform: scale(0.52); /* Adjust this to Zoom In/Out */
   }
 
+  /* SETTING: Stats Panel Position */
   #stats-panel {
-    margin-top: -60px; 
+    margin-top: 0px; 
     width: 90%; 
     max-width: 400px;
     margin-bottom: 40px;
   }
 }
 
-/* --- INTERSECTION MARKERS --- */
-.intersection {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  background-color: rgba(255, 255, 255, 0.4); 
-  border: 1px solid rgba(0,0,0,0.2);
-  border-radius: 50%;
-  transform: translate(-50%, -50%); 
-  z-index: 50; 
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0; 
+/* ==========================================================================
+   7. STATS PANEL & TURN ORDER
+   ========================================================================== */
+.game-layout {
+  display: flex; justify-content: center; align-items: flex-start;
+  gap: 40px; max-width: 1200px; margin: 0 auto;
 }
 
-.intersection:hover {
-  width: 30px;
-  height: 30px;
-  background-color: #fff;
-  border-color: #333;
-  box-shadow: 0 0 5px rgba(0,0,0,0.5);
-  font-size: 14px;
-  font-weight: bold;
-  color: #000;
-  z-index: 60;
+#stats-panel {
+  background: white; padding: 20px; border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 280px; margin-top: 40px; 
 }
+#stats-panel h3 { margin-top: 0; text-align: center; color: #333; }
 
-.intersection:hover[data-pips="10"],
-.intersection:hover[data-pips="11"], 
-.intersection:hover[data-pips="12"],
-.intersection:hover[data-pips="13"] {
-  background-color: #ffeb3b; 
-}
+.stat-row { display: flex; align-items: center; margin-bottom: 12px; }
+.stat-label { width: 50px; font-weight: bold; font-size: 14px; }
+.stat-value { width: 30px; text-align: right; font-weight: bold; }
 
-/* --- HARBORMASTER HIGHLIGHTS --- */
-.board-dimmed .hex {
-  opacity: 0.2;
-  filter: grayscale(5%);
-  transition: all 0.3s ease;
-}
+.bar-container { flex-grow: 1; background: #eee; height: 12px; border-radius: 6px; margin: 0 10px; overflow: hidden; }
+.bar { height: 100%; width: 0%; transition: width 0.5s ease; border-radius: 6px; }
 
-.board-dimmed .hex.highlight-target {
-  opacity: 1;
-  filter: grayscale(0%);
-  transform: scale(1.1); 
-  z-index: 20;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
-}
+/* Bar Colors */
+.wood-bar { background-color: #228b22; }
+.brick-bar { background-color: #e34234; }
+.sheep-bar { background-color: var(--c-sheep); }
+.wheat-bar { background-color: var(--c-wheat); }
+.ore-bar { background-color: var(--c-ore); }
 
-.board-dimmed .hex.highlight-target .token {
-  background-color: #fff;
-  border-color: #000;
-  transform: scale(1.1);
-}
-
-.board-dimmed .port.active-port {
-  opacity: 1;
-  z-index: 30;
-  transform: scale(1.2);
-}
-
-/* --- MOBILE PERFORMANCE: Disable Heavy Hover --- */
-@media (hover: none) {
-  .port:hover, .port:active {
-    filter: none !important;
-    transform: rotate(var(--rotation)) !important; 
-  }
-  
-  .board-dimmed {
-    opacity: 1 !important;
-  }
-  
-  .highlight-target {
-    box-shadow: none !important;
-    transform: none !important;
-    z-index: 1 !important;
-  }
-}
-
-/* --- DARK MODE TOGGLE --- */
-.theme-toggle {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  display: flex;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.2);
-  padding: 5px 10px;
-  border-radius: 20px;
-  z-index: 1000; 
-}
-
-.theme-toggle .icon {
-  font-size: 24px;
-  cursor: pointer;
-  opacity: 0.3; 
-  filter: grayscale(100%);
-  transition: all 0.3s ease;
-  user-select: none;
-}
-
-.theme-toggle .icon.active {
-  opacity: 1;
-  filter: grayscale(0%);
-  transform: scale(1.2);
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-}
-
-/* --- DARK MODE THEME --- */
-body.dark-mode {
-  background-color: #2c3e50 !important; 
-  color: #ecf0f1; 
-}
-
-body.dark-mode .controls {
-  background-color: #34495e; 
-  color: #fff;
-}
-body.dark-mode .toggle-container {
-  color: #333; 
-}
-
-/* --- DARK MODE FIXES --- */
-.ocean { z-index: 1; }
-.wood, .brick, .sheep, .wheat, .ore, .desert { z-index: 5; }
-.token { z-index: 10; }
-.port { z-index: 100; }
-
-#stats-panel { color: #333 !important; }
-
-body.dark-mode .ocean {
-  opacity: 0.8;      
-  filter: brightness(1.2); 
-}
-
-.token { color: #333 !important; }
-
-/* --- MOBILE ADJUSTMENTS FOR THEME TOGGLE --- */
-@media (max-width: 600px) {
-  .theme-toggle {
-    top: 10px;
-    right: 10px;
-    padding: 4px 8px;
-    gap: 6px;
-  }
-
-  .theme-toggle .icon {
-    font-size: 18px; 
-  }
-}
-
-/* --- PLAYER SELECTOR & ORDER --- */
+/* --- PLAYER SELECTOR --- */
 .player-selector {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-bottom: 15px;
-  flex-wrap: wrap; /* Helps if screen is very small */
+  display: flex; justify-content: center; gap: 15px;
+  margin-bottom: 15px; flex-wrap: wrap; 
 }
 
-/* The clickable tokens */
 .p-token {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 2px solid rgba(0,0,0,0.1);
+  width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+  border: 2px solid rgba(0,0,0,0.1); opacity: 0.5; transform: scale(0.9);
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-  opacity: 0.5;
-  transform: scale(0.9);
 }
 
-/* Specific Colors - UPDATED to include Green and Brown */
-.p-opt-Red    { background-color: #d50000; }
-.p-opt-Blue   { background-color: #1565c0; }
-.p-opt-Orange { background-color: #e65100; }
-.p-opt-White  { background-color: #ffffff; border: 2px solid #ccc; }
-.p-opt-Green  { background-color: #4caf50; }
-.p-opt-Brown  { background-color: #795548; }
+/* Player Colors Mapped */
+.p-opt-Red    { background-color: var(--p-red); }
+.p-opt-Blue   { background-color: var(--p-blue); }
+.p-opt-Orange { background-color: var(--p-orange); }
+.p-opt-White  { background-color: var(--p-white); border: 2px solid #ccc; }
+.p-opt-Green  { background-color: var(--p-green); }
+.p-opt-Brown  { background-color: var(--p-brown); }
 
-/* STATE: Selected (Active) */
-.p-token.selected {
-  opacity: 1;
-  transform: scale(1.2);
-  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-  border-color: #333; 
-}
+.p-token.selected { opacity: 1; transform: scale(1.2); box-shadow: 0 4px 6px rgba(0,0,0,0.3); border-color: #333; }
 
-/* --- ROLL BUTTON --- */
 #roll-order-btn {
-  background-color: #607d8b;
-  color: white;
-  border: none;
-  padding: 8px 20px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: bold;
-  margin-bottom: 15px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  transition: background 0.2s;
+  background-color: #607d8b; color: white; border: none; padding: 8px 20px;
+  border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: bold;
+  margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: background 0.2s;
 }
+#roll-order-btn:hover { background-color: #455a64; }
 
-#roll-order-btn:hover {
-  background-color: #455a64;
-}
+#turn-order-list { padding: 0; margin: 0; list-style: none; text-align: left; padding-left: 20px; }
+.order-item { background: #f9f9f9; border-bottom: 1px solid #eee; padding: 8px 10px; display: flex; justify-content: space-between; font-weight: bold; }
 
-#roll-order-btn:active {
-  transform: translateY(1px);
-}
-
-/* --- ORDER LIST --- */
-#turn-order-list {
-  padding: 0;
-  margin: 0;
-  list-style: none;
-  text-align: left;
-  padding-left: 20px; 
-}
-
-.order-item {
-  background: #f9f9f9;
-  border-bottom: 1px solid #eee;
-  padding: 8px 10px;
-  display: flex;
-  justify-content: space-between;
-  font-weight: bold;
-}
-
-/* Color indicators for the text - UPDATED */
-.p-Red { color: #d50000; }
-.p-Blue { color: #1565c0; }
+/* List Text Colors */
+.p-Red { color: var(--p-red); }
+.p-Blue { color: var(--p-blue); }
 .p-White { color: #9e9e9e; text-shadow: 0 0 1px #333; }
-.p-Orange { color: #e65100; }
+.p-Orange { color: var(--p-orange); }
+.p-Green { color: var(--p-green); }
+.p-Brown { color: var(--p-brown); }
 
-/* --- ANIMATIONS --- */
+/* ==========================================================================
+   8. DARK MODE & EXTRAS
+   ========================================================================== */
+body.dark-mode { background-color: var(--bg-color-dark) !important; color: #ecf0f1; }
+body.dark-mode .controls { background-color: #34495e; color: #fff; }
+body.dark-mode .toggle-container { color: #333; }
+body.dark-mode .ocean { opacity: 0.8; filter: brightness(1.2); }
 
+/* --- INTERSECTIONS --- */
+.intersection {
+  position: absolute; width: 20px; height: 20px;
+  background-color: rgba(255, 255, 255, 0.4); border: 1px solid rgba(0,0,0,0.2);
+  border-radius: 50%; transform: translate(-50%, -50%); z-index: 50; transition: all 0.2s ease;
+  display: flex; align-items: center; justify-content: center; font-size: 0; 
+}
+.intersection:hover {
+  width: 30px; height: 30px; background-color: #fff; border-color: #333;
+  box-shadow: 0 0 5px rgba(0,0,0,0.5); font-size: 14px; font-weight: bold; color: #000; z-index: 60;
+}
+
+/* --- HARBORMASTER & MOBILE PERF --- */
+.board-dimmed .hex { opacity: 0.2; filter: grayscale(5%); transition: all 0.3s ease; }
+.board-dimmed .hex.highlight-target { opacity: 1; filter: grayscale(0%); transform: scale(1.1); z-index: 20; box-shadow: 0 0 20px rgba(255, 255, 255, 0.6); }
+
+@media (hover: none) {
+  .port:hover, .port:active { filter: none !important; transform: rotate(var(--rotation)) !important; }
+  .board-dimmed { opacity: 1 !important; }
+  .highlight-target { box-shadow: none !important; transform: none !important; z-index: 1 !important; }
+}
+
+/* --- THEME TOGGLE ICON --- */
+.theme-toggle {
+  position: absolute; top: 20px; right: 20px; display: flex; gap: 10px;
+  background: rgba(255, 255, 255, 0.2); padding: 5px 10px; border-radius: 20px; z-index: 1000; 
+}
+.theme-toggle .icon { font-size: 24px; cursor: pointer; opacity: 0.3; filter: grayscale(100%); transition: all 0.3s ease; user-select: none; }
+.theme-toggle .icon.active { opacity: 1; filter: grayscale(0%); transform: scale(1.2); }
+
+@media (max-width: 600px) {
+  .theme-toggle { top: 10px; right: 10px; padding: 4px 8px; gap: 6px; }
+  .theme-toggle .icon { font-size: 18px; }
+  .game-layout { flex-direction: column; align-items: center; gap: 0; }
+  #stats-panel { width: 90%; max-width: 400px; margin-top: 10px; margin-bottom: 40px; }
+}
+
+/* --- ANIMATION --- */
 @keyframes popIn {
   0% {transform: scale(0); opacity: 0;}
   60% {transform: scale(1.1); opacity: 1;}
   100% {transform: scale(1); opacity: 1;}
 }
-
-.animate-deal {
-  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-  opacity: 0; /* Important: Start invisible so they don't flash before animating */
-}
-
-/* PERFORMANCE: Class applied by JS when animation ends to free up memory */
-.animation-finished {
-  opacity: 1 !important;
-  transform: scale(1) !important;
-  animation: none !important;
-}
+.animate-deal { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; }
+.animation-finished { opacity: 1 !important; transform: scale(1) !important; animation: none !important; }
