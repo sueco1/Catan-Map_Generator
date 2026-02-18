@@ -400,7 +400,11 @@ function renderIntersections(tiles, startDelay) {
     dot.style.left = `${pt.x}px`;
     dot.style.top = `${pt.y}px`;
     dot.dataset.pips = pt.pips;
-    dot.textContent = pt.pips; 
+    dot.textContent = pt.pips;
+
+    if (pt.pips >= 10) {
+        dot.classList.add('high-pips');
+    }
 
     // USE NEW CLASS 'animate-intersection' which handles centering
     dot.classList.add('animate-intersection');
