@@ -1,589 +1,1022 @@
-/* ==========================================================================
-   1. SETTINGS & VARIABLES
-   ========================================================================== */
+ /* ==========================================================================
+
+1. SETTINGS & VARIABLES
+
+========================================================================== */
+
 :root {
-  /* --- BACKGROUND COLORS --- */
-  --bg-color-light: #e0f7fa;
-  --bg-color-dark: #2c3e50;
-  
-  /* --- TERRAIN COLORS --- */
-  --c-wood:   #2e7d32;
-  --c-brick:  #d84315;
-  --c-sheep:  #8bc34a;
-  --c-wheat:  #fbc02d;
-  --c-ore:    #78909c;
-  --c-desert: #c2b280;
-  --c-ocean:  #0288d1;
 
-  /* --- PLAYER COLORS --- */
-  --p-red:    #d50000;
-  --p-blue:   #1565c0;
-  --p-orange: #e65100;
-  --p-white:  #ffffff;
-  --p-green:  #4caf50;
-  --p-brown:  #795548;
+/* --- BACKGROUND COLORS --- */
 
-  /* --- UI COLORS --- */
-  --btn-color: #00796b;
-  --btn-hover: #004d40;
+--bg-color-light: #e0f7fa;
+
+--bg-color-dark: #2c3e50;
+
+/* --- TERRAIN COLORS --- */
+
+--c-wood: #2e7d32;
+
+--c-brick: #d84315;
+
+--c-sheep: #8bc34a;
+
+--c-wheat: #fbc02d;
+
+--c-ore: #78909c;
+
+--c-desert: #c2b280;
+
+--c-ocean: #0288d1;
+
+
+/* --- PLAYER COLORS --- */
+
+--p-red: #d50000;
+
+--p-blue: #1565c0;
+
+--p-orange: #e65100;
+
+--p-white: #ffffff;
+
+--p-green: #4caf50;
+
+--p-brown: #795548;
+
+
+/* --- UI COLORS --- */
+
+--btn-color: #00796b;
+
+--btn-hover: #004d40;
+
 }
+
 
 body {
-  font-family: sans-serif;
-  text-align: center;
-  background-color: var(--bg-color-light); 
-  margin: 0;
-  padding: 20px;
+
+font-family: sans-serif;
+
+text-align: center;
+
+background-color: var(--bg-color-light);
+
+margin: 0;
+
+padding: 20px;
+
 }
+
 
 h1 { margin-bottom: 10px; }
 
+
 /* ==========================================================================
-   2. CONTROLS & UI
-   ========================================================================== */
+
+2. CONTROLS & UI
+
+========================================================================== */
+
 .controls {
-  display: flex;
-  flex-direction: column; 
-  align-items: center;
-  gap: 15px; 
-  margin-bottom: 20px; 
-  
-  background-color: rgba(255, 255, 255, 0.5); 
-  padding: 20px 40px;        
-  border-radius: 25px;       
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-  width: fit-content;
-  margin-left: auto;
-  margin-right: auto;
+
+display: flex;
+
+flex-direction: column;
+
+align-items: center;
+
+gap: 15px;
+
+margin-bottom: 20px;
+
+background-color: rgba(255, 255, 255, 0.5);
+
+padding: 20px 40px;
+
+border-radius: 25px;
+
+box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+
+width: fit-content;
+
+margin-left: auto;
+
+margin-right: auto;
+
 }
 
+
 #gen-btn {
-  font-size: 18px;
-  padding: 10px 30px; 
-  cursor: pointer;
-  background-color: var(--btn-color);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  transition: background 0.2s;
+
+font-size: 18px;
+
+padding: 10px 30px;
+
+cursor: pointer;
+
+background-color: var(--btn-color);
+
+color: white;
+
+border: none;
+
+border-radius: 8px;
+
+box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+
+transition: background 0.2s;
+
 }
+
 
 #gen-btn:hover { background-color: var(--btn-hover); }
 
+
 /* --- TOGGLES --- */
+
 .toggles-wrapper {
-  display: flex;
-  flex-direction: row; 
-  gap: 15px;
-  flex-wrap: wrap; 
-  justify-content: center;
+
+display: flex;
+
+flex-direction: row;
+
+gap: 15px;
+
+flex-wrap: wrap;
+
+justify-content: center;
+
 }
+
 
 .toggle-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 14px;
-  color: #333;
-  cursor: pointer;
-  background: rgba(255,255,255,0.6);
-  padding: 8px 12px;
-  border-radius: 20px;
-  user-select: none;
-  border: 1px solid rgba(0,0,0,0.05);
+
+display: flex;
+
+align-items: center;
+
+justify-content: center;
+
+gap: 8px;
+
+font-size: 14px;
+
+color: #333;
+
+cursor: pointer;
+
+background: rgba(255,255,255,0.6);
+
+padding: 8px 12px;
+
+border-radius: 20px;
+
+user-select: none;
+
+border: 1px solid rgba(0,0,0,0.05);
+
 }
+
 
 .toggle-container input {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--btn-color);
-  cursor: pointer;
+
+width: 16px;
+
+height: 16px;
+
+accent-color: var(--btn-color);
+
+cursor: pointer;
+
 }
 
+
 /* ==========================================================================
-   3. BOARD PIECES (HEXES, PORTS, TOKENS)
-   ========================================================================== */
+
+3. BOARD PIECES (HEXES, PORTS, TOKENS)
+
+========================================================================== */
+
 .hex {
-  width: 100px;
-  height: 115.47px;
-  
-  /* POSITIONING */
-  position: absolute;
-  z-index: 1;
-  
-  /* SHAPE */
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  
-  /* LAYOUT */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  
-  /* --- GAP FIX --- */
-  transform: scale(1.03) translateZ(0); 
-  transform-origin: center;
-  will-change: transform;
-  
-  margin: 0;
+
+width: 100px;
+
+height: 115.47px;
+
+/* POSITIONING */
+
+position: absolute;
+
+z-index: 1;
+
+/* SHAPE */
+
+clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+
+/* LAYOUT */
+
+display: flex;
+
+justify-content: center;
+
+align-items: center;
+
+/* --- GAP FIX --- */
+
+transform: scale(1.03) translateZ(0);
+
+transform-origin: center;
+
+will-change: transform;
+
+margin: 0;
+
 }
+
 
 /* Mapping Classes to Variables */
-.wood   { background-color: var(--c-wood); } 
-.brick  { background-color: var(--c-brick); } 
-.sheep  { background-color: var(--c-sheep); } 
-.wheat  { background-color: var(--c-wheat); } 
-.ore    { background-color: var(--c-ore); } 
-.desert { background-color: var(--c-desert); } 
-.ocean  { background-color: var(--c-ocean); opacity: 0.5; } 
+
+.wood { background-color: var(--c-wood); }
+
+.brick { background-color: var(--c-brick); }
+
+.sheep { background-color: var(--c-sheep); }
+
+.wheat { background-color: var(--c-wheat); }
+
+.ore { background-color: var(--c-ore); }
+
+.desert { background-color: var(--c-desert); }
+
+.ocean { background-color: var(--c-ocean); opacity: 0.5; }
+
 
 /* --- TOKENS (NUMBERS) --- */
+
 .token {
-  width: 35px;
-  height: 35px;
-  background-color: #fff8e1; 
-  border-radius: 50%;
-  border: 2px solid #333;
-  display: flex;
-  flex-direction: column; 
-  align-items: center;
-  justify-content: center;
-  font-family: 'Times New Roman', serif;
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-  z-index: 10;
-  color: #333 !important; 
-  transition: opacity 0.2s ease;
+
+width: 35px;
+
+height: 35px;
+
+background-color: #fff8e1;
+
+border-radius: 50%;
+
+border: 2px solid #333;
+
+display: flex;
+
+flex-direction: column;
+
+align-items: center;
+
+justify-content: center;
+
+font-family: 'Times New Roman', serif;
+
+box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+
+z-index: 10;
+
+color: #333 !important;
+
+transition: opacity 0.2s ease;
+
 }
+
 
 .token.red { color: var(--p-red) !important; }
+
 .token.orange { color: var(--p-orange) !important; }
 
+
 .token-number { font-size: 16px; font-weight: bold; line-height: 1; }
+
 .token-pips { font-size: 14px; line-height: 0.6; font-weight: bold; letter-spacing: -1px; }
 
-/* --- PORTS (CLASSIC CATAN DOCKS) --- */
+
+/* --- PORTS --- */
+
 .port {
-  width: 100%; height: 100%;
-  display: flex; align-items: center; justify-content: center;
-  position: absolute; 
-  pointer-events: auto; /* Ensures the mouse event fires for JS */
-  z-index: 100; /* Keeps it above hexes so hover is detected */
-  cursor: pointer;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+
+width: 100%; height: 100%;
+
+display: flex; align-items: center; justify-content: center;
+
+position: absolute;
+
+pointer-events: auto; /* Ensures the mouse event fires for JS */
+
+z-index: 100; /* Keeps it above hexes so hover is detected */
+
+cursor: pointer;
+
+transition: opacity 0.2s ease, transform 0.2s ease;
+
 }
 
-/* The Left Dock Stick */
-.port::before {
-  content: ""; 
-  position: absolute; 
-  width: 6px; 
-  height: 45px; 
-  background: #ffffff; 
-  border: 1px solid rgba(0,0,0,0.2);
-  top: 50%; 
-  left: 50%;
-  transform-origin: top center; 
-  z-index: 1; 
-  border-radius: 3px;
-  pointer-events: none; 
-  /* Angle and position the left stick outward */
-  transform: translate(-50%, 0) rotate(-30deg) translateY(-25px); 
+
+/* Clicks pass through the white sticks to the icon */
+
+.port::before, .port::after {
+
+content: ""; position: absolute; width: 4px; height: 48px;
+
+background: #fff; top: 50%; left: 50%;
+
+transform-origin: top center; z-index: 1; border-radius: 2px;
+
+pointer-events: none;
+
 }
 
-/* The Right Dock Stick */
-.port::after {
-  content: ""; 
-  position: absolute; 
-  width: 6px; 
-  height: 45px; 
-  background: #ffffff; 
-  border: 1px solid rgba(0,0,0,0.2);
-  top: 50%; 
-  left: 50%;
-  transform-origin: top center; 
-  z-index: 1; 
-  border-radius: 3px;
-  pointer-events: none; 
-  /* Angle and position the right stick outward */
-  transform: translate(-50%, 0) rotate(30deg) translateY(-25px); 
-}
+.port::before { transform: translate(-50%, 0) rotate(-30deg); }
 
-/* The Floating White Circle */
+.port::after { transform: translate(-50%, 0) rotate(30deg); }
+
+
 .port-icon {
-  width: 44px; height: 44px; /* Larger to match classic style */
-  border-radius: 50%; 
-  border: 3px solid #fff;
-  background: white; 
-  color: #333;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; font-weight: bold;
-  z-index: 5; 
-  box-shadow: 0 4px 6px rgba(0,0,0,0.4);
-  position: absolute; 
-  /* Push the circle out to the ends of the sticks */
-  top: 50%;
-  margin-top: -22px; /* Half of height to keep centered vertically */
-  transform: translateY(20px); 
+
+width: 32px; height: 32px;
+
+border-radius: 50%; border: 2px solid #fff;
+
+background: white; color: #333;
+
+display: flex; align-items: center; justify-content: center;
+
+font-size: 11px; font-weight: bold;
+
+z-index: 5; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+
+position: relative;
+
 }
+
 
 /* Port Colors mapped to variables */
-.port-icon.wood  { background: #4caf50; color: white; } 
-.port-icon.sheep { background: var(--c-sheep); color: white; }
-.port-icon.wheat { background: #ffeb3b; color: #333; }
-.port-icon.brick { background: #f44336; color: white; }
-.port-icon.ore   { background: #9e9e9e; color: white; }
-.port-icon.generic { background: #fff; color: #333; }
+
+.port-icon.wood { background: #4caf50; color: black; }
+
+.port-icon.sheep { background: var(--c-sheep); color: black; }
+
+.port-icon.wheat { background: #ffeb3b; color: black; }
+
+.port-icon.brick { background: #f44336; color: black; }
+
+.port-icon.ore { background: #9e9e9e; color: black; }
+
+.port-icon.generic { background: #eee; color: black; }
+
 
 /* ==========================================================================
-   4. COORDINATES (POSITIONS)
-   ========================================================================== */
+
+4. COORDINATES (POSITIONS)
+
+========================================================================== */
+
 .tile-0 { top: 150px; left: 250px; }
+
 .tile-1 { top: 150px; left: 350px; }
+
 .tile-2 { top: 150px; left: 450px; }
+
 .tile-3 { top: 236px; left: 200px; }
+
 .tile-4 { top: 236px; left: 300px; }
+
 .tile-5 { top: 236px; left: 400px; }
+
 .tile-6 { top: 236px; left: 500px; }
+
 .tile-7 { top: 322px; left: 150px; }
+
 .tile-8 { top: 322px; left: 250px; }
+
 .tile-9 { top: 322px; left: 350px; }
+
 .tile-10{ top: 322px; left: 450px; }
+
 .tile-11{ top: 322px; left: 550px; }
+
 .tile-12{ top: 408px; left: 200px; }
+
 .tile-13{ top: 408px; left: 300px; }
+
 .tile-14{ top: 408px; left: 400px; }
+
 .tile-15{ top: 408px; left: 500px; }
+
 .tile-16{ top: 494px; left: 250px; }
+
 .tile-17{ top: 494px; left: 350px; }
+
 .tile-18{ top: 494px; left: 450px; }
 
+
 /* Water Tiles */
+
 .water-0 { top: 64px; left: 200px; }
+
 .water-1 { top: 64px; left: 300px; }
+
 .water-2 { top: 64px; left: 400px; }
+
 .water-3 { top: 64px; left: 500px; }
+
 .water-4 { top: 150px; left: 150px; }
+
 .water-5 { top: 150px; left: 550px; }
+
 .water-6 { top: 236px; left: 100px; }
+
 .water-7 { top: 236px; left: 600px; }
-.water-8 { top: 322px; left: 50px;  }
+
+.water-8 { top: 322px; left: 50px; }
+
 .water-9 { top: 322px; left: 650px; }
+
 .water-10{ top: 408px; left: 100px; }
+
 .water-11{ top: 408px; left: 600px; }
+
 .water-12{ top: 494px; left: 150px; }
+
 .water-13{ top: 494px; left: 550px; }
+
 .water-14{ top: 580px; left: 200px; }
+
 .water-15{ top: 580px; left: 300px; }
+
 .water-16{ top: 580px; left: 400px; }
+
 .water-17{ top: 580px; left: 500px; }
 
+
 /* ==========================================================================
-   5. BOARD CONTAINER
-   ========================================================================== */
+
+5. BOARD CONTAINER
+
+========================================================================== */
+
 #board-container {
-  position: relative;
-  width: 100%;
-  min-height: 650px; 
-  overflow: visible; 
-  display: flex;
-  justify-content: center;
-  align-items: center;
+
+position: relative;
+
+width: 100%;
+
+min-height: 650px;
+
+overflow: visible;
+
+display: flex;
+
+justify-content: center;
+
+align-items: center;
+
+}
+
+
+#board {
+
+position: relative;
+
+width: 800px;
+
+height: 700px;
+
+transform: scale(0.9);
+
+transform-origin: top center;
+
+margin: 0 auto;
+
+}
+
+
+/* ==========================================================================
+
+6. RESPONSIVE / MOBILE SETTINGS
+
+========================================================================== */
+
+@media (max-width: 900px) {
+
+#board { transform: scale(0.75); }
+
+#board-container { min-height: 550px; }
+
+}
+
+
+@media (max-width: 600px) {
+
+.controls { margin-bottom: 5px !important; }
+
+#board-container {
+
+min-height: 400px;
+
+height: 400px;
+
+padding: 0;
+
+overflow: hidden;
+
 }
 
 #board {
-  position: relative; 
-  width: 800px;
-  height: 700px;
-  transform: scale(0.9) translateZ(0); /* translateZ fixes visual bugs */
-  transform-origin: top center;
-  margin: 0 auto;
-  contain: layout paint; /* FIX FOR ANDROID MOBILE LAG */
+
+transform: scale(0.52);
+
+transform-origin: top center;
+
+left: 50%;
+
+margin-left: -400px;
+
+top: 0;
+
 }
+
+}
+
 
 /* ==========================================================================
-   6. RESPONSIVE / MOBILE SETTINGS
-   ========================================================================== */
-@media (max-width: 900px) {
-  #board { transform: scale(0.75) translateZ(0); }
-  #board-container { min-height: 550px; }
-}
 
-@media (max-width: 600px) {
-  .controls { margin-bottom: 5px !important; }
-  #board-container {
-    min-height: 400px; 
-    height: 400px;
-    padding: 0; 
-    overflow: hidden; 
-  }
-  #board {
-    transform: scale(0.52) translateZ(0);
-    transform-origin: top center;
-    left: 50%;
-    margin-left: -400px; 
-    top: 0;
-  }
-}
+7. STATS PANEL & TURN ORDER
 
-/* ==========================================================================
-   7. STATS PANEL & TURN ORDER
-   ========================================================================== */
+========================================================================== */
+
 .game-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  margin-top: 10px;
+
+display: flex;
+
+flex-direction: column;
+
+align-items: center;
+
+gap: 10px;
+
+width: 100%;
+
+margin-top: 10px;
+
 }
+
 
 #stats-panel {
-  background: white; padding: 20px; border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 280px; 
-  margin-top: 20px; 
-  margin-bottom: 50px;
-  z-index: 200; 
-  position: relative;
+
+background: white; padding: 20px; border-radius: 12px;
+
+box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 280px;
+
+margin-top: 20px;
+
+margin-bottom: 50px;
+
+z-index: 200;
+
+position: relative;
+
 }
+
 #stats-panel h3 { margin-top: 0; text-align: center; color: #333; }
 
+
 .stat-row { display: flex; align-items: center; margin-bottom: 12px; }
+
 .stat-label { width: 50px; font-weight: bold; font-size: 14px; }
+
 .stat-value { width: 30px; text-align: right; font-weight: bold; }
 
+
 .bar-container { flex-grow: 1; background: #eee; height: 12px; border-radius: 6px; margin: 0 10px; overflow: hidden; }
+
 .bar { height: 100%; width: 0%; transition: width 0.5s ease; border-radius: 6px; }
 
+
 .wood-bar { background-color: var(--c-wood); }
+
 .brick-bar { background-color: var(--c-brick); }
+
 .sheep-bar { background-color: var(--c-sheep); }
+
 .wheat-bar { background-color: var(--c-wheat); }
+
 .ore-bar { background-color: var(--c-ore); }
 
+
 /* --- PLAYER SELECTOR --- */
+
 .player-selector {
-  display: flex; justify-content: center; gap: 15px;
-  margin-bottom: 15px; flex-wrap: wrap; 
+
+display: flex; justify-content: center; gap: 15px;
+
+margin-bottom: 15px; flex-wrap: wrap;
+
 }
+
 
 .p-token {
-  width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
-  border: 2px solid rgba(0,0,0,0.1); opacity: 0.5; transform: scale(0.9);
-  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+
+width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+
+border: 2px solid rgba(0,0,0,0.1); opacity: 0.5; transform: scale(0.9);
+
+transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
 }
 
-.p-opt-Red    { background-color: var(--p-red); }
-.p-opt-Blue   { background-color: var(--p-blue); }
+
+.p-opt-Red { background-color: var(--p-red); }
+
+.p-opt-Blue { background-color: var(--p-blue); }
+
 .p-opt-Orange { background-color: var(--p-orange); }
-.p-opt-White  { background-color: var(--p-white); border: 2px solid #eee; }
-.p-opt-Green  { background-color: var(--p-green); }
-.p-opt-Brown  { background-color: var(--p-brown); }
+
+.p-opt-White { background-color: var(--p-white); border: 2px solid #eee; }
+
+.p-opt-Green { background-color: var(--p-green); }
+
+.p-opt-Brown { background-color: var(--p-brown); }
+
 
 .p-token.selected { opacity: 1; transform: scale(1.2); box-shadow: 0 4px 6px rgba(0,0,0,0.3); border-color: #333; }
 
+
 #roll-order-btn {
-  background-color: #607d8b; color: white; border: none; padding: 8px 20px;
-  border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: bold;
-  margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: background 0.2s;
+
+background-color: #607d8b; color: white; border: none; padding: 8px 20px;
+
+border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: bold;
+
+margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: background 0.2s;
+
 }
+
 #roll-order-btn:hover { background-color: #455a64; }
 
+
 #turn-order-list { padding: 0; margin: 0; list-style: none; text-align: left; padding-left: 20px; }
+
 .order-item { background: #f9f9f9; border-bottom: 1px solid #eee; padding: 8px 10px; display: flex; justify-content: space-between; font-weight: bold; }
 
+
 .p-Red { color: var(--p-red); }
+
 .p-Blue { color: var(--p-blue); }
+
 .p-White { color: #fff; text-shadow: 0 0 3px #000000; }
+
 .p-Orange { color: var(--p-orange); }
+
 .p-Green { color: var(--p-green); }
+
 .p-Brown { color: var(--p-brown); }
 
+
 /* ==========================================================================
-   8. DARK MODE & EXTRAS
-   ========================================================================== */
+
+8. DARK MODE & EXTRAS
+
+========================================================================== */
+
 body.dark-mode { background-color: var(--bg-color-dark) !important; color: #ecf0f1; }
+
 body.dark-mode .controls { background-color: #34495e; color: #fff; }
+
 body.dark-mode .toggle-container { color: #333; }
+
 body.dark-mode .ocean { opacity: 0.8; filter: brightness(1.2); }
 
+
 body.dark-mode #stats-panel {background-color: #ffffff; color: #333333;}
-body.dark-mode .stat-label, 
+
+body.dark-mode .stat-label,
+
 body.dark-mode .stat-value {color: #333333;}
 
+
 /* --- INTERSECTIONS (OPTIMIZED FOR MOBILE) --- */
+
 .intersection {
-  position: absolute; 
-  width: 20px; 
-  height: 20px;
-  background-color: rgba(255, 255, 255, 0.4); 
-  border: 1px solid rgba(0,0,0,0.2);
-  border-radius: 50%; 
-  /* Base transform now includes scale(1) */
-  transform: translate(-50%, -50%) scale(1); 
-  z-index: 50; 
-  
-  /* STOP using 'all' - only transition what changes */
-  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  font-size: 0; 
-  
-  /* Force hardware acceleration */
-  backface-visibility: hidden; 
+
+position: absolute;
+
+width: 20px;
+
+height: 20px;
+
+background-color: rgba(255, 255, 255, 0.4);
+
+border: 1px solid rgba(0,0,0,0.2);
+
+border-radius: 50%;
+
+/* Base transform now includes scale(1) */
+
+transform: translate(-50%, -50%) scale(1);
+
+z-index: 50;
+
+/* STOP using 'all' - only transition what changes */
+
+transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+
+display: flex;
+
+align-items: center;
+
+justify-content: center;
+
+font-size: 0;
+
+/* Force hardware acceleration */
+
+backface-visibility: hidden;
+
 }
+
 
 .intersection:hover {
-  background-color: #fff; 
-  border-color: #333;
-  box-shadow: 0 0 5px rgba(0,0,0,0.5); 
-  font-size: 14px; 
-  font-weight: bold; 
-  color: #000; 
-  z-index: 60;
-  
-  /* Use scale instead of changing width/height */
-  transform: translate(-50%, -50%) scale(1.5); 
+
+background-color: #fff;
+
+border-color: #333;
+
+box-shadow: 0 0 5px rgba(0,0,0,0.5);
+
+font-size: 14px;
+
+font-weight: bold;
+
+color: #000;
+
+z-index: 60;
+
+/* Use scale instead of changing width/height */
+
+transform: translate(-50%, -50%) scale(1.5);
+
 }
+
 
 /* 1. Default State for High Pips (Gold but semi-transparent) */
+
 .intersection.high-pips {
-  background-color: rgba(255, 215, 0, 0.8); /* Gold */
-  border: 1px solid rgba(184, 134, 11, 0.6); /* Dark Goldenrod border */
+
+background-color: rgba(255, 215, 0, 0.8); /* Gold */
+
+border: 1px solid rgba(184, 134, 11, 0.6); /* Dark Goldenrod border */
+
 }
+
 
 /* 2. Hover State for High Pips (Solid Gold) */
+
 .intersection.high-pips:hover {
-  background-color: #FFD700; /* Solid Gold */
-  border-color: #000;
-  box-shadow: 0 0 10px gold; /* Add a little glow on hover */
+
+background-color: #FFD700; /* Solid Gold */
+
+border-color: #000;
+
+box-shadow: 0 0 10px gold; /* Add a little glow on hover */
+
 }
 
+
 /* ==========================================================================
-   9. HARBORMASTER HOVER LOGIC (FIXED)
-   ========================================================================== */
+
+9. HARBORMASTER HOVER LOGIC (FIXED)
+
+========================================================================== */
+
 
 /* 1. Base State: When board is dimmed... */
 
+
 /* Dim all Land and Ocean tiles that are NOT targets.
-   :not(.port-wrapper) ensures we don't dim the invisible port containers,
-   which would accidentally dim the active ports inside them. */
+
+:not(.port-wrapper) ensures we don't dim the invisible port containers,
+
+which would accidentally dim the active ports inside them. */
+
 .board-dimmed .hex:not(.port-wrapper):not(.highlight-target) {
-  opacity: 0.5 !important;
-  filter: grayscale(50%);
-  transition: all 0.2s ease;
+
+opacity: 0.5 !important;
+
+filter: grayscale(50%);
+
+transition: all 0.2s ease;
+
 }
+
 
 /* Dim all Ports that are NOT active */
+
 .board-dimmed .port:not(.active-port) {
-  opacity: 0.5;
-  filter: grayscale(50%);
-  transition: all 0.2s ease;
+
+opacity: 0.5;
+
+filter: grayscale(50%);
+
+transition: all 0.2s ease;
+
 }
+
 
 /* 2. Highlight State: The Target Land Hexes */
+
 .board-dimmed .hex.highlight-target {
-  opacity: 1 !important;
-  z-index: 600; /* Must be higher than the port wrappers (500) */
-  transform: scale(1.08); /* Pop out effect */
-  box-shadow: 0 0 25px rgba(255, 255, 255, 0.8);
-  filter: none;
+
+opacity: 1 !important;
+
+z-index: 600; /* Must be higher than the port wrappers (500) */
+
+transform: scale(1.08); /* Pop out effect */
+
+box-shadow: 0 0 25px rgba(255, 255, 255, 0.8);
+
+filter: none;
+
 }
+
 
 /* Ensure tokens on highlighted hexes look sharp */
+
 .board-dimmed .hex.highlight-target .token {
-  opacity: 1;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+
+opacity: 1;
+
+box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+
 }
+
 
 /* 3. Highlight State: The Active Port */
+
 /* Force the wrapper of the active port to stay fully opaque.
-   (The Wrapper is transparent, but its opacity controls the child) */
+
+(The Wrapper is transparent, but its opacity controls the child) */
+
 .board-dimmed .hex.port-wrapper {
-    opacity: 1 !important;
+
+opacity: 1 !important;
+
 }
 
+
 /* The actual port stick/icon */
+
 .board-dimmed .port.active-port {
-  opacity: 1 !important;
-  filter: none;
-  z-index: 1000;
-  transform: scale(1.15) rotate(var(--rotation)); /* Slight zoom + keep rotation */
+
+opacity: 1 !important;
+
+filter: none;
+
+z-index: 1000;
+
+transform: scale(1.15) rotate(var(--rotation)); /* Slight zoom + keep rotation */
+
 }
+
 
 
 /* --- THEME TOGGLE ICON --- */
+
 .theme-toggle {
-  position: absolute; top: 20px; right: 20px; display: flex; gap: 10px;
-  background: rgba(255, 255, 255, 0.2); padding: 5px 10px; border-radius: 20px; z-index: 1000; 
+
+position: absolute; top: 20px; right: 20px; display: flex; gap: 10px;
+
+background: rgba(255, 255, 255, 0.2); padding: 5px 10px; border-radius: 20px; z-index: 1000;
+
 }
+
 .theme-toggle .icon { font-size: 24px; cursor: pointer; opacity: 0.3; filter: grayscale(100%); transition: all 0.3s ease; user-select: none; }
+
 .theme-toggle .icon.active { opacity: 1; filter: grayscale(0%); transform: scale(1.2); }
 
+
 @media (max-width: 600px) {
-  .theme-toggle { top: 10px; right: 10px; padding: 4px 8px; gap: 6px; }
-  .theme-toggle .icon { font-size: 18px; }
+
+.theme-toggle { top: 10px; right: 10px; padding: 4px 8px; gap: 6px; }
+
+.theme-toggle .icon { font-size: 18px; }
+
 }
+
 
 /* --- ANIMATION --- */
+
 @keyframes popIn {
-  0% {transform: scale(0); opacity: 0;}
-  60% {transform: scale(1.1); opacity: 1;}
-  100% {transform: scale(1); opacity: 1;}
+
+0% {transform: scale(0); opacity: 0;}
+
+60% {transform: scale(1.1); opacity: 1;}
+
+100% {transform: scale(1); opacity: 1;}
+
 }
+
 .animate-deal {
-  will-change: transform, opacity;
-  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+
+will-change: transform, opacity;
+
+animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+
 }
+
 .animation-finished { opacity: 1 !important; transform: scale(1) !important; animation: none !important; }
 
+
 /* ==========================================================================
-   10. LAYOUT & RESPONSIVENESS
-   ========================================================================== */
+
+10. LAYOUT & RESPONSIVENESS
+
+========================================================================== */
+
 
 /* STANDARD LAYOUT: Vertical Stack */
+
 .game-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center; 
-  gap: 20px;
-  width: 100%;
-  margin-top: 10px;
+
+display: flex;
+
+flex-direction: column;
+
+align-items: center;
+
+gap: 20px;
+
+width: 100%;
+
+margin-top: 10px;
+
+}
+
+
+#board-container {
+
+display: block;
+
+height: auto;
+
+}
+
+
+/* LARGE SCREENS (> 1300px): Side by Side */
+
+@media (min-width: 1300px) {
+
+.game-container {
+
+display: flex;
+
+flex-direction: row;
+
+align-items: flex-start;
+
+justify-content: center;
+
+gap: 40px;
+
 }
 
 #board-container {
-  display: block; 
-  height: auto;
+
+flex: 0 0 auto;
+
+width: 800px;
+
 }
 
-/* LARGE SCREENS (> 1300px): Side by Side */
-@media (min-width: 1300px) {
-  .game-container {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 40px;
-  }
-  
-  #board-container {
-    flex: 0 0 auto;
-    width: 800px;
-  }
 
-  #stats-panel {
-    margin-top: 80px; 
-    width: 300px;
-  }
+#stats-panel {
+
+margin-top: 80px;
+
+width: 300px;
+
 }
+
+}
+
 
 /* --- HARDWARE ACCELERATION FOR ANIMATIONS --- */
-.animate-deal, 
+
+.animate-deal,
+
 .animate-intersection {
-  will-change: transform, opacity;
-  backface-visibility: hidden;
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
-}
+
+will-change: transform, opacity;
+
+backface-visibility: hidden;
+
+-webkit-transform: translateZ(0);
+
+transform: translateZ(0);
+
+} 
