@@ -376,16 +376,41 @@ body.dark-mode #stats-panel {background-color: #ffffff; color: #333333;}
 body.dark-mode .stat-label, 
 body.dark-mode .stat-value {color: #333333;}
 
-/* --- INTERSECTIONS --- */
+/* --- INTERSECTIONS (OPTIMIZED FOR MOBILE) --- */
 .intersection {
-  position: absolute; width: 20px; height: 20px;
-  background-color: rgba(255, 255, 255, 0.4); border: 1px solid rgba(0,0,0,0.2);
-  border-radius: 50%; transform: translate(-50%, -50%); z-index: 50; transition: all 0.2s ease;
-  display: flex; align-items: center; justify-content: center; font-size: 0; 
+  position: absolute; 
+  width: 20px; 
+  height: 20px;
+  background-color: rgba(255, 255, 255, 0.4); 
+  border: 1px solid rgba(0,0,0,0.2);
+  border-radius: 50%; 
+  /* Base transform now includes scale(1) */
+  transform: translate(-50%, -50%) scale(1); 
+  z-index: 50; 
+  
+  /* STOP using 'all' - only transition what changes */
+  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  font-size: 0; 
+  
+  /* Force hardware acceleration */
+  backface-visibility: hidden; 
 }
+
 .intersection:hover {
-  width: 30px; height: 30px; background-color: #fff; border-color: #333;
-  box-shadow: 0 0 5px rgba(0,0,0,0.5); font-size: 14px; font-weight: bold; color: #000; z-index: 60;
+  background-color: #fff; 
+  border-color: #333;
+  box-shadow: 0 0 5px rgba(0,0,0,0.5); 
+  font-size: 14px; 
+  font-weight: bold; 
+  color: #000; 
+  z-index: 60;
+  
+  /* Use scale instead of changing width/height */
+  transform: translate(-50%, -50%) scale(1.5); 
 }
 
 /* 1. Default State for High Pips (Gold but semi-transparent) */
@@ -517,4 +542,13 @@ body.dark-mode .stat-value {color: #333333;}
     margin-top: 80px; 
     width: 300px;
   }
+}
+
+/* --- HARDWARE ACCELERATION FOR ANIMATIONS --- */
+.animate-deal, 
+.animate-intersection {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
