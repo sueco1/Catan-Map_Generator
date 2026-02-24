@@ -162,7 +162,7 @@ h1 { margin-bottom: 10px; }
 .token-number { font-size: 16px; font-weight: bold; line-height: 1; }
 .token-pips { font-size: 14px; line-height: 0.6; font-weight: bold; letter-spacing: -1px; }
 
-/* --- PORTS --- */
+/* --- PORTS (CLASSIC CATAN DOCKS) --- */
 .port {
   width: 100%; height: 100%;
   display: flex; align-items: center; justify-content: center;
@@ -173,33 +173,67 @@ h1 { margin-bottom: 10px; }
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
-/* Clicks pass through the white sticks to the icon */
-.port::before, .port::after {
-  content: ""; position: absolute; width: 4px; height: 48px; 
-  background: #fff; top: 50%; left: 50%;
-  transform-origin: top center; z-index: 1; border-radius: 2px;
+/* The Left Dock Stick */
+.port::before {
+  content: ""; 
+  position: absolute; 
+  width: 6px; 
+  height: 45px; 
+  background: #ffffff; 
+  border: 1px solid rgba(0,0,0,0.2);
+  top: 50%; 
+  left: 50%;
+  transform-origin: top center; 
+  z-index: 1; 
+  border-radius: 3px;
   pointer-events: none; 
+  /* Angle and position the left stick outward */
+  transform: translate(-50%, 0) rotate(-30deg) translateY(-25px); 
 }
-.port::before { transform: translate(-50%, 0) rotate(-30deg); }
-.port::after  { transform: translate(-50%, 0) rotate(30deg); }
 
+/* The Right Dock Stick */
+.port::after {
+  content: ""; 
+  position: absolute; 
+  width: 6px; 
+  height: 45px; 
+  background: #ffffff; 
+  border: 1px solid rgba(0,0,0,0.2);
+  top: 50%; 
+  left: 50%;
+  transform-origin: top center; 
+  z-index: 1; 
+  border-radius: 3px;
+  pointer-events: none; 
+  /* Angle and position the right stick outward */
+  transform: translate(-50%, 0) rotate(30deg) translateY(-25px); 
+}
+
+/* The Floating White Circle */
 .port-icon {
-  width: 32px; height: 32px;
-  border-radius: 50%; border: 2px solid #fff;
-  background: white; color: #333;
+  width: 44px; height: 44px; /* Larger to match classic style */
+  border-radius: 50%; 
+  border: 3px solid #fff;
+  background: white; 
+  color: #333;
   display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: bold;
-  z-index: 5; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  position: relative; 
+  font-size: 14px; font-weight: bold;
+  z-index: 5; 
+  box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+  position: absolute; 
+  /* Push the circle out to the ends of the sticks */
+  top: 50%;
+  margin-top: -22px; /* Half of height to keep centered vertically */
+  transform: translateY(20px); 
 }
 
 /* Port Colors mapped to variables */
-.port-icon.wood  { background: #4caf50; color: black; } 
-.port-icon.sheep { background: var(--c-sheep); color: black; }
-.port-icon.wheat { background: #ffeb3b; color: black; }
-.port-icon.brick { background: #f44336; color: black; }
-.port-icon.ore   { background: #9e9e9e; color: black; }
-.port-icon.generic { background: #eee; color: black; }
+.port-icon.wood  { background: #4caf50; color: white; } 
+.port-icon.sheep { background: var(--c-sheep); color: white; }
+.port-icon.wheat { background: #ffeb3b; color: #333; }
+.port-icon.brick { background: #f44336; color: white; }
+.port-icon.ore   { background: #9e9e9e; color: white; }
+.port-icon.generic { background: #fff; color: #333; }
 
 /* ==========================================================================
    4. COORDINATES (POSITIONS)
@@ -261,16 +295,17 @@ h1 { margin-bottom: 10px; }
   position: relative; 
   width: 800px;
   height: 700px;
-  transform: scale(0.9);
+  transform: scale(0.9) translateZ(0); /* translateZ fixes visual bugs */
   transform-origin: top center;
   margin: 0 auto;
+  contain: layout paint; /* FIX FOR ANDROID MOBILE LAG */
 }
 
 /* ==========================================================================
    6. RESPONSIVE / MOBILE SETTINGS
    ========================================================================== */
 @media (max-width: 900px) {
-  #board { transform: scale(0.75); }
+  #board { transform: scale(0.75) translateZ(0); }
   #board-container { min-height: 550px; }
 }
 
@@ -283,7 +318,7 @@ h1 { margin-bottom: 10px; }
     overflow: hidden; 
   }
   #board {
-    transform: scale(0.52);
+    transform: scale(0.52) translateZ(0);
     transform-origin: top center;
     left: 50%;
     margin-left: -400px; 

@@ -410,9 +410,11 @@ function renderIntersections(tiles, startDelay) {
     dot.classList.add('animate-intersection');
     dot.style.animationDelay = `${dotDelay * 0.03}s`; 
     
-    // Ensure the opacity stays at 1 after animation ends
+    // Ensure the opacity stays at 1 after animation ends,
+    // AND remove the class to flatten the layer on mobile browsers!
     dot.addEventListener('animationend', () => {
       dot.style.opacity = '1';
+      dot.classList.remove('animate-intersection'); 
     }, { once: true });
 
     boardDiv.appendChild(dot);
